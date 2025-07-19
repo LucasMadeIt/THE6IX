@@ -1,12 +1,34 @@
 "use client"
 
+import type React from "react"
+
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Textarea } from "@/components/ui/textarea"
 import { Navigation } from "@/components/navigation"
-import { Search, Grid, List, Filter, Heart, Users, Calendar, Tag, Play, Sparkles } from "lucide-react"
+import {
+  Search,
+  Grid,
+  List,
+  Filter,
+  Heart,
+  Users,
+  Calendar,
+  Tag,
+  Play,
+  Sparkles,
+  Edit,
+  Trash2,
+  MoreVertical,
+  Upload,
+  X,
+  ImageIcon,
+} from "lucide-react"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import Link from "next/link"
 
 interface MemoryRoom {
@@ -27,8 +49,13 @@ export default function MyMemoriesPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [searchQuery, setSearchQuery] = useState("")
   const [sortBy, setSortBy] = useState("recent")
+  const [editingRoom, setEditingRoom] = useState<MemoryRoom | null>(null)
+  const [editTitle, setEditTitle] = useState("")
+  const [editDescription, setEditDescription] = useState("")
+  const [editThumbnail, setEditThumbnail] = useState<string | null>(null)
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null)
 
-  const [memoryRooms] = useState<MemoryRoom[]>([
+  const [memoryRooms, setMemoryRooms] = useState<MemoryRoom[]>([
     {
       id: "1",
       title: "Grandma's Kitchen",
@@ -111,6 +138,57 @@ export default function MyMemoriesPage() {
       room.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase())),
   )
 
+  const handleEditRoom = (room: MemoryRoom) => {
+    setEditingRoom(room)
+    setEditTitle(room.title)
+    setEditDescription(room.description)
+    setEditThumbnail(room.thumbnail)
+    setThumbnailFile(null)
+  }
+
+  const handleThumbnailUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      setThumbnailFile(file)
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        setEditThumbnail(e.target?.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const removeThumbnail = () => {
+    setThumbnailFile(null)
+    setEditThumbnail("/placeholder.svg?height=280&width=400")
+  }
+
+  const handleSaveEdit = () => {
+    if (editingRoom) {
+      setMemoryRooms((rooms) =>
+        rooms.map((room) =>
+          room.id === editingRoom.id
+            ? {
+                ...room,
+                title: editTitle,
+                description: editDescription,
+                thumbnail: editThumbnail || room.thumbnail,
+              }
+            : room,
+        ),
+      )
+      setEditingRoom(null)
+      setEditTitle("")
+      setEditDescription("")
+      setEditThumbnail(null)
+      setThumbnailFile(null)
+    }
+  }
+
+  const handleDeleteRoom = (roomId: string) => {
+    setMemoryRooms((rooms) => rooms.filter((room) => room.id !== roomId))
+  }
+
   return (
     <div className="min-h-screen bg-[#F5F1ED]">
       <Navigation />
@@ -139,14 +217,18 @@ export default function MyMemoriesPage() {
               />
             </div>
 
-            {/* Mobile Filter Controls */}
-            <div className="flex gap-2 bg-transparent">
+            {/* Mobile Filter Controls with consistent beige/brown background */}
+            <div className="flex gap-2">
               <div className="flex gap-2">
                 <Button
                   variant={viewMode === "grid" ? "default" : "outline"}
                   size="sm"
                   onClick={() => setViewMode("grid")}
-                  className="rounded-full px-4 py-2"
+                  className={`rounded-full px-4 py-2 ${
+                    viewMode === "grid"
+                      ? "bg-[#8B745F] hover:bg-[#6B5B4F] text-white border-[#8B745F]"
+                      : "bg-[#F0EBE5] hover:bg-[#E4DCD0] text-[#8B745F] border-[#E4DCD0]"
+                  }`}
                 >
                   <Grid className="w-4 h-4 mr-2" />
                   Grid
@@ -155,14 +237,22 @@ export default function MyMemoriesPage() {
                   variant={viewMode === "list" ? "default" : "outline"}
                   size="sm"
                   onClick={() => setViewMode("list")}
-                  className="rounded-full px-4 py-2"
+                  className={`rounded-full px-4 py-2 ${
+                    viewMode === "list"
+                      ? "bg-[#8B745F] hover:bg-[#6B5B4F] text-white border-[#8B745F]"
+                      : "bg-[#F0EBE5] hover:bg-[#E4DCD0] text-[#8B745F] border-[#E4DCD0]"
+                  }`}
                 >
                   <List className="w-4 h-4 mr-2" />
                   List
                 </Button>
               </div>
 
-              <Button variant="outline" size="sm" className="rounded-full px-4 py-2 bg-transparent">
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-full px-4 py-2 bg-[#F0EBE5] hover:bg-[#E4DCD0] text-[#8B745F] border-[#E4DCD0]"
+              >
                 <Filter className="w-4 h-4 mr-2" />
                 Filter
               </Button>
@@ -205,10 +295,39 @@ export default function MyMemoriesPage() {
                     </div>
                   )}
 
-                  <div className="absolute top-3 right-3">
+                  <div className="absolute top-3 right-3 flex gap-2">
                     <Badge className="bg-white/90 text-[#8B745F] border-0 rounded-full shadow-sm text-xs">
                       {room.objectCount} objects
                     </Badge>
+
+                    {/* Edit/Delete Menu */}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="bg-white/90 hover:bg-white rounded-full w-8 h-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                        >
+                          <MoreVertical className="w-4 h-4 text-[#8B745F]" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="bg-white border-[#E4DCD0]">
+                        <DropdownMenuItem
+                          onClick={() => handleEditRoom(room)}
+                          className="text-[#8B745F] hover:bg-[#F0EBE5] cursor-pointer"
+                        >
+                          <Edit className="w-4 h-4 mr-2" />
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleDeleteRoom(room.id)}
+                          className="text-red-600 hover:bg-red-50 cursor-pointer"
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
 
                   <Button
@@ -287,6 +406,96 @@ export default function MyMemoriesPage() {
           )}
         </div>
       </div>
+
+      {/* Edit Dialog */}
+      <Dialog open={!!editingRoom} onOpenChange={() => setEditingRoom(null)}>
+        <DialogContent className="bg-white border-[#E4DCD0] max-w-md mx-4 sm:mx-auto">
+          <DialogHeader>
+            <DialogTitle className="font-serif text-xl text-[#43382F] tracking-wide">Edit Memory Room</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div>
+              <label className="block text-sm font-medium text-[#43382F] mb-2">Room Title</label>
+              <Input
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                className="bg-[#F0EBE5] border-[#E4DCD0] rounded-xl text-[#43382F]"
+                placeholder="Enter room title..."
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-[#43382F] mb-2">Description</label>
+              <Textarea
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
+                className="bg-[#F0EBE5] border-[#E4DCD0] rounded-xl text-[#43382F] resize-none"
+                rows={3}
+                placeholder="Enter description..."
+              />
+            </div>
+
+            {/* Thumbnail Upload Section */}
+            <div>
+              <label className="block text-sm font-medium text-[#43382F] mb-2">Room Thumbnail</label>
+              {editThumbnail && !editThumbnail.includes("placeholder") ? (
+                <div className="relative">
+                  <img
+                    src={editThumbnail || "/placeholder.svg"}
+                    alt="Room thumbnail"
+                    className="w-full h-32 object-cover rounded-xl"
+                  />
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={removeThumbnail}
+                    className="absolute top-2 right-2 bg-white/90 hover:bg-white rounded-full w-8 h-8 p-0"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              ) : (
+                <div className="border-2 border-dashed border-[#E4DCD0] rounded-xl p-6 text-center bg-[#F0EBE5]">
+                  <ImageIcon className="w-8 h-8 text-[#8B745F] mx-auto mb-3" />
+                  <p className="text-sm text-[#6B5B4F] mb-3">Upload a thumbnail image for your room</p>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleThumbnailUpload}
+                    className="hidden"
+                    id="edit-thumbnail-upload"
+                  />
+                  <label htmlFor="edit-thumbnail-upload">
+                    <Button
+                      asChild
+                      variant="outline"
+                      size="sm"
+                      className="rounded-full bg-white border-[#8B745F] text-[#8B745F] hover:bg-[#F0EBE5]"
+                    >
+                      <span className="cursor-pointer">
+                        <Upload className="w-4 h-4 mr-2" />
+                        Choose Image
+                      </span>
+                    </Button>
+                  </label>
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-3 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => setEditingRoom(null)}
+                className="flex-1 bg-white border-[#E4DCD0] text-[#8B745F] hover:bg-[#F0EBE5] rounded-xl"
+              >
+                Cancel
+              </Button>
+              <Button onClick={handleSaveEdit} className="flex-1 bg-[#8B745F] hover:bg-[#6B5B4F] text-white rounded-xl">
+                Save Changes
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

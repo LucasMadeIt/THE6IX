@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Sparkles, Menu, X } from "lucide-react"
+import { Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useState } from "react"
@@ -23,10 +23,10 @@ export function Navigation() {
       <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 py-4 sm:py-5">
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-2 sm:space-x-3">
-          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#8B745F] rounded-xl flex items-center justify-center shadow-sm">
-            <Sparkles className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
+          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#F0EBE5] rounded-xl flex items-center justify-center shadow-sm">
+            <img src="/xperi3d-logo.png" alt="XPERI3D" className="w-6 h-6 sm:w-8 sm:h-8 object-contain" />
           </div>
-          <span className="font-serif text-xl sm:text-2xl font-semibold text-[#43382F] tracking-wide">Roomember</span>
+          <span className="font-serif text-xl sm:text-2xl font-semibold text-[#43382F] tracking-wide">XPERI3D</span>
         </Link>
 
         {/* Desktop Nav Links */}

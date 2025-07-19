@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
 import { Navigation } from "@/components/navigation"
-import { Upload, Video, Sparkles, Clock, CheckCircle, ArrowRight, Camera, ImageIcon, X } from "lucide-react"
+import { Upload, Video, Clock, CheckCircle, ArrowRight, Camera, ImageIcon, X } from "lucide-react"
 import Link from "next/link"
 
 export default function UploadPage() {
@@ -51,6 +51,10 @@ export default function UploadPage() {
     setIsProcessing(false)
   }
 
+  const triggerFileUpload = () => {
+    document.getElementById("video-upload")?.click()
+  }
+
   return (
     <div className="min-h-screen bg-[#F5F1ED]">
       <Navigation />
@@ -80,8 +84,16 @@ export default function UploadPage() {
               <Card className="bg-white border border-[#E4DCD0] rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg">
                 <CardContent className="p-8 sm:p-16">
                   <div className="text-center">
-                    <div className="w-20 h-20 sm:w-24 sm:h-24 bg-[#F0EBE5] rounded-full flex items-center justify-center mx-auto mb-6 sm:mb-8">
-                      <Upload className="w-10 h-10 sm:w-12 sm:h-12 text-[#8B745F]" />
+                    {/* Clickable Logo */}
+                    <div
+                      className="w-20 h-20 sm:w-24 sm:h-24 bg-[#F0EBE5] rounded-full flex items-center justify-center mx-auto mb-6 sm:mb-8 cursor-pointer hover:bg-[#E4DCD0] smooth-transition hover:scale-105"
+                      onClick={triggerFileUpload}
+                    >
+                      <img
+                        src="/xperi3d-logo.png"
+                        alt="XPERI3D Logo"
+                        className="w-12 h-12 sm:w-16 sm:h-16 object-contain"
+                      />
                     </div>
                     <h3 className="font-serif text-xl sm:text-2xl font-semibold text-[#43382F] mb-3 sm:mb-4 tracking-wide">
                       Upload Your Video
@@ -302,7 +314,11 @@ export default function UploadPage() {
             <Card className="bg-white border border-[#E4DCD0] rounded-2xl sm:rounded-3xl shadow-lg">
               <CardContent className="p-12 sm:p-16 text-center">
                 <div className="w-20 h-20 sm:w-24 sm:h-24 bg-[#F0EBE5] rounded-full flex items-center justify-center mx-auto mb-6 sm:mb-8 animate-pulse">
-                  <Sparkles className="w-10 h-10 sm:w-12 sm:h-12 text-[#8B745F] animate-spin" />
+                  <img
+                    src="/xperi3d-logo.png"
+                    alt="XPERI3D Logo"
+                    className="w-12 h-12 sm:w-16 sm:h-16 object-contain animate-spin"
+                  />
                 </div>
                 <h3 className="font-serif text-xl sm:text-2xl font-semibold text-[#43382F] mb-4 sm:mb-6 tracking-wide">
                   Creating Your 3D Memory Room
@@ -336,9 +352,9 @@ export default function UploadPage() {
                   {roomTitle} has been transformed into a beautiful 3D space. Ready to add your memories?
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-                  <Link href="/ai-assistant">
+                  <Link href="/my-memories">
                     <Button className="bg-[#8B745F] hover:bg-[#6B5B4F] text-white rounded-full px-6 sm:px-8 py-3 sm:py-4 smooth-transition font-medium tracking-wide w-full sm:w-auto">
-                      Start Adding Memories
+                      View My Memories
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
                   </Link>
@@ -347,7 +363,7 @@ export default function UploadPage() {
                       variant="outline"
                       className="rounded-full bg-white border-[#8B745F] text-[#8B745F] hover:bg-[#F0EBE5] px-6 sm:px-8 py-3 sm:py-4 smooth-transition font-medium tracking-wide w-full sm:w-auto"
                     >
-                      Back to Gallery
+                      Back to Home
                     </Button>
                   </Link>
                 </div>

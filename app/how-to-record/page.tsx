@@ -1,300 +1,359 @@
 "use client"
 
+import React from "react"
+
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { Navigation } from "@/components/navigation"
 import {
   Camera,
-  Home,
-  Sun,
-  Move,
   Clock,
-  CheckCircle,
-  AlertTriangle,
   Lightbulb,
+  CheckCircle,
+  ArrowRight,
+  Play,
   Smartphone,
-  RotateCw,
-  Package,
+  Video,
+  Settings,
+  Eye,
+  Move,
+  Zap,
 } from "lucide-react"
 import Link from "next/link"
 
 export default function HowToRecordPage() {
-  const roomTips = [
-    {
-      icon: <Home className="w-6 h-6" />,
-      title: "Start at the Doorway",
-      description: "Begin recording from the entrance to give context and natural flow",
-      color: "bg-blue-100 text-blue-600",
-    },
-    {
-      icon: <RotateCw className="w-6 h-6" />,
-      title: "Walk Slowly in a Loop",
-      description: "Move steadily around the room, capturing all four walls in one continuous motion",
-      color: "bg-amber-100 text-amber-600",
-    },
-    {
-      icon: <Sun className="w-6 h-6" />,
-      title: "Use Natural Light",
-      description: "Film during daylight hours or ensure all room lights are on for even illumination",
-      color: "bg-yellow-100 text-yellow-600",
-    },
-    {
-      icon: <Camera className="w-6 h-6" />,
-      title: "Capture Key Objects",
-      description: "Pause briefly on important items you want to tag later - photos, furniture, decorations",
-      color: "bg-rose-100 text-rose-600",
-    },
-  ]
+  const [activeStep, setActiveStep] = useState(1)
 
-  const objectTips = [
+  const steps = [
     {
-      icon: <Package className="w-6 h-6" />,
-      title: "360° Object Coverage",
-      description: "Walk completely around the object to capture all angles and details",
-      color: "bg-emerald-100 text-emerald-600",
-    },
-    {
-      icon: <Move className="w-6 h-6" />,
-      title: "Multiple Heights",
-      description: "Film from different heights - eye level, slightly above, and below if possible",
-      color: "bg-purple-100 text-purple-600",
-    },
-    {
-      icon: <Lightbulb className="w-6 h-6" />,
-      title: "Close-up Details",
-      description: "Capture texture, patterns, and small details that make the object unique",
-      color: "bg-indigo-100 text-indigo-600",
-    },
-    {
-      icon: <Clock className="w-6 h-6" />,
-      title: "Take Your Time",
-      description: "Spend 30-60 seconds per object for best 3D reconstruction quality",
-      color: "bg-teal-100 text-teal-600",
-    },
-  ]
-
-  const examples = [
-    {
-      title: "Living Room",
-      description: "Start at entrance, pan across sofa and coffee table, capture windows and artwork",
-      quality: "Excellent",
-      duration: "3-4 minutes",
-      image: "/placeholder.svg?height=200&width=300",
-    },
-    {
-      title: "Kitchen",
-      description: "Focus on countertops, appliances, and dining area with good overhead lighting",
-      quality: "Good",
+      id: 1,
+      title: "Prepare Your Space",
+      icon: Settings,
       duration: "2-3 minutes",
-      image: "/placeholder.svg?height=200&width=300",
+      description: "Clean and organize your room for the best 3D reconstruction",
+      tips: [
+        "Remove clutter and unnecessary items",
+        "Ensure good lighting throughout the room",
+        "Open curtains or blinds for natural light",
+        "Turn on all room lights for even illumination",
+      ],
     },
     {
-      title: "Vintage Clock",
-      description: "360° rotation showing face, sides, and intricate details of mechanisms",
-      quality: "Excellent",
-      duration: "45 seconds",
-      image: "/placeholder.svg?height=200&width=300",
+      id: 2,
+      title: "Camera Setup",
+      icon: Camera,
+      duration: "1 minute",
+      description: "Configure your device for optimal video quality",
+      tips: [
+        "Use landscape orientation (horizontal)",
+        "Set video quality to 1080p or higher",
+        "Enable image stabilization if available",
+        "Clean your camera lens for clarity",
+      ],
+    },
+    {
+      id: 3,
+      title: "Recording Technique",
+      icon: Video,
+      duration: "1-3 minutes",
+      description: "Follow the proper recording pattern for best results",
+      tips: [
+        "Start at the room entrance/doorway",
+        "Move slowly and steadily in a clockwise direction",
+        "Keep the camera at chest height (4-5 feet)",
+        "Overlap your shots by 30-50% for better stitching",
+      ],
+    },
+    {
+      id: 4,
+      title: "Capture Everything",
+      icon: Eye,
+      duration: "Throughout recording",
+      description: "Make sure to include all important details",
+      tips: [
+        "Film all four walls of the room",
+        "Include the ceiling and floor in your shots",
+        "Capture furniture and decorative items",
+        "Don't forget corners and hidden areas",
+      ],
     },
   ]
 
   const commonMistakes = [
-    "Moving too quickly or shaking the camera",
-    "Recording in dim lighting or with harsh shadows",
-    "Missing corners or important areas of the room",
-    "Recording vertically instead of horizontally",
-    "Not overlapping coverage areas sufficiently",
+    {
+      mistake: "Moving too quickly",
+      solution: "Take your time - slow, steady movements work best",
+      icon: Move,
+    },
+    {
+      mistake: "Poor lighting conditions",
+      solution: "Record during daytime with all lights on",
+      icon: Lightbulb,
+    },
+    {
+      mistake: "Shaky footage",
+      solution: "Use both hands and move smoothly",
+      icon: Smartphone,
+    },
+    {
+      mistake: "Missing areas",
+      solution: "Follow a systematic pattern around the room",
+      icon: Eye,
+    },
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 via-amber-25 to-rose-50">
+    <div className="min-h-screen bg-[#F5F1ED]">
       <Navigation />
 
-      <div className="pt-24 pb-20 px-6">
+      <div className="pt-20 pb-20 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-16">
-            section classNatext-4xl md:text-6xl font-bold text-stone-800 mb-6 font-sans<h2 className="font-serif text-3xl font-bold text-stone-800 mb-4">Recording Rooms & Spaces</h2>
-              <p className="text-stone-600">Perfect for bedrooms, kitchens, living rooms, and special spaces</p>
-            </div>
+          <div className="text-center mb-12 sm:mb-16">
+            <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl font-normal text-[#43382F] mb-4 sm:mb-6 tracking-wide leading-tight">
+              How to Record
+              <br />
+              <span className="italic">Perfect Videos</span>
+            </h1>
+            <p className="text-base sm:text-lg text-[#6B5B4F] max-w-2xl mx-auto leading-relaxed font-light px-4">
+              Follow our step-by-step guide to capture your space perfectly for 3D reconstruction
+            </p>
+          </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-              {roomTips.map((tip, index) => (
-                <Card key={index} className="bg-white/60 backdrop-blur-sm border border-stone-200/50 rounded-2xl">
-                  <CardContent className="p-6">
-                    <div className="flex items-start space-x-4">
-                      <div className={`w-12 h-12 rounded-full flex items-center justify-center ${tip.color}`}>
-                        {tip.icon}
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-serif text-lg font-bold text-stone-800 mb-2">{tip.title}</h4>
-                        <p className="text-stone-600 text-sm leading-relaxed">{tip.description}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </section>
+          {/* Quick Stats */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-12 sm:mb-16">
+            <Card className="bg-white border border-[#E4DCD0] rounded-xl sm:rounded-2xl shadow-sm">
+              <CardContent className="p-6 text-center">
+                <div className="w-12 h-12 bg-[#F0EBE5] rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Clock className="w-6 h-6 text-[#8B745F]" />
+                </div>
+                <h3 className="font-serif text-lg font-semibold text-[#43382F] mb-2">1-3 Minutes</h3>
+                <p className="text-sm text-[#6B5B4F] font-light">Recording Duration</p>
+              </CardContent>
+            </Card>
 
-          {/* Object Recording Tips */}
-          <section className="mb-16">
-            <div className="text-center mb-8">
-              <h2 className="font-serif text-3xl font-bold text-stone-800 mb-4">Recording Objects & Items</h2>
-              <p className="text-stone-600">Perfect for treasured items, heirlooms, and special possessions</p>
-            </div>
+            <Card className="bg-white border border-[#E4DCD0] rounded-xl sm:rounded-2xl shadow-sm">
+              <CardContent className="p-6 text-center">
+                <div className="w-12 h-12 bg-[#F0EBE5] rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Video className="w-6 h-6 text-[#8B745F]" />
+                </div>
+                <h3 className="font-serif text-lg font-semibold text-[#43382F] mb-2">1080p+</h3>
+                <p className="text-sm text-[#6B5B4F] font-light">Minimum Quality</p>
+              </CardContent>
+            </Card>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-              {objectTips.map((tip, index) => (
-                <Card key={index} className="bg-white/60 backdrop-blur-sm border border-stone-200/50 rounded-2xl">
-                  <CardContent className="p-6">
-                    <div className="flex items-start space-x-4">
-                      <div className={`w-12 h-12 rounded-full flex items-center justify-center ${tip.color}`}>
-                        {tip.icon}
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-serif text-lg font-bold text-stone-800 mb-2">{tip.title}</h4>
-                        <p className="text-stone-600 text-sm leading-relaxed">{tip.description}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </section>
+            <Card className="bg-white border border-[#E4DCD0] rounded-xl sm:rounded-2xl shadow-sm">
+              <CardContent className="p-6 text-center">
+                <div className="w-12 h-12 bg-[#F0EBE5] rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Zap className="w-6 h-6 text-[#8B745F]" />
+                </div>
+                <h3 className="font-serif text-lg font-semibold text-[#43382F] mb-2">2-3 Min</h3>
+                <p className="text-sm text-[#6B5B4F] font-light">Processing Time</p>
+              </CardContent>
+            </Card>
+          </div>
 
-          {/* Example Videos */}
-          <section className="mb-16">
-            <h2 className="font-serif text-3xl font-bold text-stone-800 text-center mb-8">Example Recordings</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {examples.map((example, index) => (
-                <Card key={index} className="bg-white/60 backdrop-blur-sm border border-stone-200/50 rounded-2xl">
-                  <CardContent className="p-0">
-                    <div className="aspect-video overflow-hidden rounded-t-2xl">
-                      <img
-                        src={example.image || "/placeholder.svg"}
-                        alt={example.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="p-6">
-                      <div className="flex items-center justify-between mb-3">
-                        <h4 className="font-serif text-lg font-bold text-stone-800">{example.title}</h4>
-                        <Badge
-                          variant="outline"
-                          className={`${
-                            example.quality === "Excellent"
-                              ? "border-emerald-200 text-emerald-700 bg-emerald-50"
-                              : "border-amber-200 text-amber-700 bg-amber-50"
+          {/* Step-by-Step Guide */}
+          <div className="mb-12 sm:mb-16">
+            <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-[#43382F] mb-8 sm:mb-12 text-center tracking-wide">
+              Step-by-Step Guide
+            </h2>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12">
+              {/* Steps Navigation */}
+              <div className="space-y-4">
+                {steps.map((step) => (
+                  <Card
+                    key={step.id}
+                    className={`cursor-pointer transition-all duration-300 border ${
+                      activeStep === step.id
+                        ? "bg-[#F0EBE5] border-[#8B745F] shadow-md"
+                        : "bg-white border-[#E4DCD0] hover:border-[#D4C4B0]"
+                    } rounded-xl sm:rounded-2xl`}
+                    onClick={() => setActiveStep(step.id)}
+                  >
+                    <CardContent className="p-6">
+                      <div className="flex items-start space-x-4">
+                        <div
+                          className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                            activeStep === step.id ? "bg-[#8B745F]" : "bg-[#F0EBE5]"
                           }`}
                         >
-                          <CheckCircle className="w-3 h-3 mr-1" />
-                          {example.quality}
-                        </Badge>
+                          <step.icon
+                            className={`w-6 h-6 ${activeStep === step.id ? "text-white" : "text-[#8B745F]"}`}
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-2">
+                            <h3
+                              className={`font-serif text-lg font-semibold tracking-wide ${
+                                activeStep === step.id ? "text-[#43382F]" : "text-[#6B5B4F]"
+                              }`}
+                            >
+                              {step.title}
+                            </h3>
+                            <Badge
+                              variant="outline"
+                              className={`text-xs ${
+                                activeStep === step.id
+                                  ? "border-[#8B745F] text-[#8B745F] bg-white"
+                                  : "border-[#D4C4B0] text-[#8B745F] bg-[#F0EBE5]"
+                              }`}
+                            >
+                              {step.duration}
+                            </Badge>
+                          </div>
+                          <p
+                            className={`text-sm font-light leading-relaxed ${
+                              activeStep === step.id ? "text-[#43382F]" : "text-[#8B745F]"
+                            }`}
+                          >
+                            {step.description}
+                          </p>
+                        </div>
                       </div>
-                      <p className="text-stone-600 text-sm mb-3 leading-relaxed">{example.description}</p>
-                      <div className="flex items-center text-xs text-stone-500">
-                        <Clock className="w-3 h-3 mr-1" />
-                        {example.duration}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              {/* Step Details */}
+              <div className="lg:sticky lg:top-24">
+                <Card className="bg-white border border-[#E4DCD0] rounded-xl sm:rounded-2xl shadow-lg">
+                  <CardContent className="p-8">
+                    <div className="flex items-center space-x-4 mb-6">
+                      <div className="w-16 h-16 bg-[#8B745F] rounded-full flex items-center justify-center">
+                        {React.createElement(steps[activeStep - 1].icon, {
+                          className: "w-8 h-8 text-white",
+                        })}
+                      </div>
+                      <div>
+                        <h3 className="font-serif text-xl font-semibold text-[#43382F] tracking-wide">
+                          {steps[activeStep - 1].title}
+                        </h3>
+                        <p className="text-[#6B5B4F] font-light">{steps[activeStep - 1].description}</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <h4 className="font-medium text-[#43382F] mb-4">Key Tips:</h4>
+                      {steps[activeStep - 1].tips.map((tip, index) => (
+                        <div key={index} className="flex items-start space-x-3">
+                          <CheckCircle className="w-5 h-5 text-[#8B745F] mt-0.5 flex-shrink-0" />
+                          <p className="text-sm text-[#6B5B4F] font-light leading-relaxed">{tip}</p>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="flex gap-3 mt-8">
+                      <Button
+                        variant="outline"
+                        onClick={() => setActiveStep(Math.max(1, activeStep - 1))}
+                        disabled={activeStep === 1}
+                        className="flex-1 bg-white border-[#E4DCD0] text-[#8B745F] hover:bg-[#F0EBE5] rounded-xl"
+                      >
+                        Previous
+                      </Button>
+                      <Button
+                        onClick={() => setActiveStep(Math.min(4, activeStep + 1))}
+                        disabled={activeStep === 4}
+                        className="flex-1 bg-[#8B745F] hover:bg-[#6B5B4F] text-white rounded-xl"
+                      >
+                        Next Step
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </div>
+
+          {/* Common Mistakes */}
+          <div className="mb-12 sm:mb-16">
+            <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-[#43382F] mb-8 sm:mb-12 text-center tracking-wide">
+              Common Mistakes to Avoid
+            </h2>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
+              {commonMistakes.map((item, index) => (
+                <Card key={index} className="bg-white border border-[#E4DCD0] rounded-xl sm:rounded-2xl shadow-sm">
+                  <CardContent className="p-6">
+                    <div className="flex items-start space-x-4">
+                      <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center">
+                        <item.icon className="w-6 h-6 text-red-500" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-serif text-lg font-semibold text-[#43382F] mb-2 tracking-wide">
+                          {item.mistake}
+                        </h4>
+                        <p className="text-sm text-[#6B5B4F] font-light leading-relaxed mb-3">
+                          <span className="font-medium text-[#8B745F]">Solution:</span> {item.solution}
+                        </p>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
               ))}
             </div>
-          </section>
+          </div>
 
-          {/* Technical Guidelines */}
-          <section className="mb-16">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <Card className="bg-white/60 backdrop-blur-sm border border-stone-200/50 rounded-2xl">
-                <CardContent className="p-6">
-                  <h3 className="font-serif text-xl font-bold text-stone-800 mb-4 flex items-center">
-                    <Smartphone className="w-5 h-5 mr-2 text-amber-600" />
-                    Technical Requirements
-                  </h3>
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <span className="text-stone-600">Resolution</span>
-                      <Badge variant="outline" className="bg-emerald-50 border-emerald-200 text-emerald-700">
-                        1080p+ recommended
-                      </Badge>
+          {/* Video Example Placeholder */}
+          <div className="mb-12 sm:mb-16">
+            <Card className="bg-white border border-[#E4DCD0] rounded-2xl sm:rounded-3xl shadow-lg overflow-hidden">
+              <CardContent className="p-0">
+                <div className="aspect-video bg-gradient-to-br from-[#F0EBE5] to-[#E4DCD0] flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="w-20 h-20 bg-white/90 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <Play className="w-10 h-10 text-[#8B745F]" />
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-stone-600">Frame Rate</span>
-                      <Badge variant="outline" className="bg-amber-50 border-amber-200 text-amber-700">
-                        30fps required
-                      </Badge>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-stone-600">Duration</span>
-                      <Badge variant="outline" className="bg-rose-50 border-rose-200 text-rose-700">
-                        1-3 minutes
-                      </Badge>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-stone-600">File Size</span>
-                      <Badge variant="outline" className="bg-blue-50 border-blue-200 text-blue-700">
-                        Max 500MB
-                      </Badge>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-stone-600">Orientation</span>
-                      <Badge variant="outline" className="bg-purple-50 border-purple-200 text-purple-700">
-                        Horizontal only
-                      </Badge>
-                    </div>
+                    <h3 className="font-serif text-xl font-semibold text-[#43382F] mb-2 tracking-wide">
+                      Example Recording
+                    </h3>
+                    <p className="text-[#6B5B4F] font-light">
+                      Watch how to properly record your room for 3D reconstruction
+                    </p>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
-              <Card className="bg-white/60 backdrop-blur-sm border border-stone-200/50 rounded-2xl">
-                <CardContent className="p-6">
-                  <h3 className="font-serif text-xl font-bold text-stone-800 mb-4 flex items-center">
-                    <AlertTriangle className="w-5 h-5 mr-2 text-rose-600" />
-                    Common Mistakes to Avoid
-                  </h3>
-                  <div className="space-y-3">
-                    {commonMistakes.map((mistake, index) => (
-                      <div key={index} className="flex items-start">
-                        <div className="w-2 h-2 bg-rose-400 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                        <p className="text-stone-600 text-sm">{mistake}</p>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </section>
-
-          {/* Call to Action */}
-          <section className="text-center">
-            <Card className="bg-gradient-to-r from-amber-100 via-rose-100 to-emerald-100 border border-stone-200/50 rounded-3xl">
-              <CardContent className="p-12">
-                <h3 className="font-serif text-2xl font-bold text-stone-800 mb-4">Ready to Create Your Memory Room?</h3>
-                <p className="text-stone-600 mb-8 max-w-2xl mx-auto">
-                  Now that you know the secrets to perfect recording, it's time to capture your special spaces and
-                  transform them into 3D memories.
+          {/* Ready to Start */}
+          <div className="text-center">
+            <Card className="bg-white border border-[#E4DCD0] rounded-2xl sm:rounded-3xl shadow-lg">
+              <CardContent className="p-8 sm:p-12">
+                <div className="w-16 h-16 bg-[#F0EBE5] rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Camera className="w-8 h-8 text-[#8B745F]" />
+                </div>
+                <h3 className="font-serif text-2xl sm:text-3xl font-semibold text-[#43382F] mb-4 tracking-wide">
+                  Ready to Create Your Memory Room?
+                </h3>
+                <p className="text-[#6B5B4F] mb-8 max-w-md mx-auto font-light leading-relaxed">
+                  Now that you know the techniques, start recording your special space and transform it into a 3D
+                  memory.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Link href="/upload">
-                    <Button
-                      size="lg"
-                      className="bg-gradient-to-r from-amber-500 via-rose-500 to-emerald-500 hover:from-amber-600 hover:via-rose-600 hover:to-emerald-600 text-white rounded-full px-8 py-3"
-                    >
-                      <Camera className="w-5 h-5 mr-2" />
+                    <Button className="bg-[#8B745F] hover:bg-[#6B5B4F] text-white rounded-full px-8 py-4 smooth-transition font-medium tracking-wide w-full sm:w-auto">
                       Start Recording
+                      <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
                   </Link>
-                  <Link href="/">
-                    <Button variant="outline" size="lg" className="rounded-full px-8 py-3 bg-white/70 border-stone-300">
-                      Back to Gallery
+                  <Link href="/my-memories">
+                    <Button
+                      variant="outline"
+                      className="rounded-full bg-white border-[#8B745F] text-[#8B745F] hover:bg-[#F0EBE5] px-8 py-4 smooth-transition font-medium tracking-wide w-full sm:w-auto"
+                    >
+                      View My Memories
                     </Button>
                   </Link>
                 </div>
               </CardContent>
             </Card>
-          </section>
+          </div>
         </div>
       </div>
     </div>
