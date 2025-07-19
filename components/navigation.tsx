@@ -26,7 +26,8 @@ export function Navigation() {
           <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#F0EBE5] rounded-xl flex items-center justify-center shadow-sm">
             <img src="/xperi3d-logo.png" alt="XPERI3D" className="w-6 h-6 sm:w-8 sm:h-8 object-contain" />
           </div>
-          <span className="font-serif text-xl sm:text-2xl font-semibold text-[#43382F] tracking-wide">XPERI3D</span>
+          <span className="font-serif text-xl sm:text-2xl font-semibold text-[#43382F] tracking-wide">Roomember
+</span>
         </Link>
 
         {/* Desktop Nav Links */}
