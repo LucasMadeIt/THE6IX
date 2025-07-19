@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Google-Fonts: elegant serif + clean sans-serif */
+/* REMOVED @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@300;400;500;600&display=swap"); */
+
+@layer base {
+  :root {
+    --background: 245 241 237; /* #F5F1ED - cream white */
+    --foreground: 67 56 48; /* #43382F - dark brown */
+    --card: 255 255 255; /* white */
+    --card-foreground: 67 56 48;
+    --popover: 255 255 255;
+    --popover-foreground: 67 56 48;
+    --primary: 139 116 95; /* #8B745F - warm brown */
+    --primary-foreground: 255 255 255;
+    --secondary: 228 220 208; /* #E4DCD0 - light beige */
+    --secondary-foreground: 67 56 48;
+    --muted: 240 235 229; /* #F0EBE5 - very light beige */
+    --muted-foreground: 107 91 79; /* #6B5B4F - medium brown */
+    --accent: 212 196 176; /* #D4C4B0 - main beige */
+    --accent-foreground: 67 56 48;
+    --destructive: 220 38 38;
+    --destructive-foreground: 248 250 252;
+    --border: 228 220 208; /* #E4DCD0 */
+    --input: 240 235 229;
+    --ring: 139 116 95;
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-family: var(--font-inter), sans-serif;
+  }
+  .font-serif {
+    font-family: var(--font-playfair), serif;
+  }
+}
+
+/* Custom decorative elements */
+.decorative-line {
+  position: absolute;
+  stroke: rgb(212 196 176 / 0.3);
+  stroke-width: 2;
+  fill: none;
+  pointer-events: none;
+}
+
+/* Smooth animations */
+.smooth-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgb(240 235 229);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(212 196 176);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(139 116 95);
+}
