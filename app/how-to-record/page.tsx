@@ -31,7 +31,7 @@ export default function HowToRecordPage() {
       id: 1,
       title: "Prepare Your Space",
       icon: Settings,
-      duration: "2-3 minutes",
+      duration: "15 minutes",
       description: "Clean and organize your room for the best 3D reconstruction",
       tips: [
         "Remove clutter and unnecessary items",
@@ -149,7 +149,7 @@ export default function HowToRecordPage() {
                 <div className="w-12 h-12 bg-[#F0EBE5] rounded-full flex items-center justify-center mx-auto mb-4">
                   <Zap className="w-6 h-6 text-[#8B745F]" />
                 </div>
-                <h3 className="font-serif text-lg font-semibold text-[#43382F] mb-2">2-3 Min</h3>
+                <h3 className="font-serif text-lg font-semibold text-[#43382F] mb-2">30 Min</h3>
                 <p className="text-sm text-[#6B5B4F] font-light">Processing Time</p>
               </CardContent>
             </Card>
