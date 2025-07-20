@@ -78,7 +78,7 @@ export default function MyMemoriesPage() {
       processing: true,
     },
     {
-      id: "2",
+      id: "3",
       title: "Grandma's Kitchen",
       description: "Sunday morning pancakes and warm conversations that filled our hearts",
       thumbnail: "/images/grandmas-kitchen.jpg",
@@ -107,7 +107,7 @@ export default function MyMemoriesPage() {
       ],
     },
     {
-      id: "3",
+      id: "4",
       title: "Mom's Garden Shed",
       description: "Where tools became treasures and every plant had a story",
       thumbnail: "/images/garden-shed.jpg",
@@ -129,7 +129,7 @@ export default function MyMemoriesPage() {
       ],
     },
     {
-      id: "4",
+      id: "5",
       title: "College Dorm Room",
       description: "Late night study sessions, friendships, and discovering who I am",
       thumbnail: "/images/college-dorm.jpg",
@@ -151,7 +151,7 @@ export default function MyMemoriesPage() {
       ],
     },
     {
-      id: "5",
+      id: "6",
       title: "Movie Theatre",
       description: "Where stories came alive and dreams were born on the silver screen",
       thumbnail: "/images/movie-theatre.jpg",
@@ -173,7 +173,7 @@ export default function MyMemoriesPage() {
       ],
     },
     {
-      id: "6",
+      id: "7",
       title: "Bathroom",
       description: "A peaceful sanctuary for self-care, reflection, and quiet moments of solitude",
       thumbnail: "/images/bathroom.jpg",
