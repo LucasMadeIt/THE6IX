@@ -21,10 +21,10 @@ export function Navigation() {
         <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-3">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#8B745F] rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-sm sm:text-base">ML</span>
+            <div className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center">
+              <img src="/3d-logo.png" alt="Memory Lane 3D Logo" className="w-8 h-8 sm:w-10 sm:h-10 object-contain" />
             </div>
-            <span className="font-serif text-xl sm:text-2xl font-semibold text-[#43382F] tracking-wide">
+            <span className="font-serif text-xl sm:text-2xl font-normal text-[#43382F] tracking-wide italic">
               Memory Lane
             </span>
           </Link>
@@ -53,10 +53,12 @@ export function Navigation() {
             <SheetContent side="right" className="bg-white border-[#E4DCD0] w-64">
               <div className="flex flex-col space-y-6 mt-8">
                 <div className="flex items-center space-x-3 pb-6 border-b border-[#E4DCD0]">
-                  <div className="w-10 h-10 bg-[#8B745F] rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold">ML</span>
+                  <div className="w-10 h-10 flex items-center justify-center">
+                    <img src="/3d-logo.png" alt="Memory Lane 3D Logo" className="w-10 h-10 object-contain" />
                   </div>
-                  <span className="font-serif text-xl font-semibold text-[#43382F] tracking-wide">Memory Lane</span>
+                  <span className="font-serif text-xl font-normal text-[#43382F] tracking-wide italic">
+                    Memory Lane
+                  </span>
                 </div>
                 {navItems.map((item) => (
                   <Link

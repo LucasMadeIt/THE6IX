@@ -14,7 +14,6 @@ import {
   Camera,
   Heart,
   Users,
-  Sparkles,
   ArrowRight,
   Tag,
   Calendar,
@@ -292,13 +291,18 @@ export default function HomePage() {
                   {room.processing && (
                     <div className="absolute inset-0 bg-white/95 backdrop-blur-sm flex items-center justify-center">
                       <div className="text-center">
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#D4C4B0] rounded-full flex items-center justify-center mx-auto mb-3 animate-pulse">
-                          <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-[#8B745F] animate-spin" />
+                        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <img
+                            src="/funny-processing.gif"
+                            alt="Processing animation"
+                            className="w-full h-full object-contain rounded-full"
+                          />
                         </div>
-                        <p className="text-xs sm:text-sm font-medium text-[#43382F]">Processing into 3D...</p>
-                        <div className="w-24 sm:w-32 h-1 bg-[#E4DCD0] rounded-full mt-2 mx-auto">
-                          <div className="w-3/4 h-1 bg-[#8B745F] rounded-full animate-pulse"></div>
+                        <p className="text-xs sm:text-sm font-medium text-[#43382F] mb-2">Processing into 3D...</p>
+                        <div className="w-24 sm:w-32 h-2 bg-[#E4DCD0] rounded-full mx-auto">
+                          <div className="w-[1%] h-2 bg-[#8B745F] rounded-full"></div>
                         </div>
+                        <p className="text-xs text-[#8B745F] mt-1">1% complete</p>
                       </div>
                     </div>
                   )}
@@ -462,7 +466,7 @@ export default function HomePage() {
                         <Badge
                           key={tag}
                           variant="outline"
-                          className="text-xs border-amber-200 text-amber-700 bg-amber-50 pr-1"
+                          className="text-xs border-[#D4C4B0] text-[#8B745F] bg-[#F0EBE5] pr-1"
                         >
                           <Tag className="w-3 h-3 mr-1" />
                           {tag}
@@ -470,9 +474,9 @@ export default function HomePage() {
                             size="sm"
                             variant="ghost"
                             onClick={() => handleRemoveTag(tag)}
-                            className="ml-1 h-4 w-4 p-0 hover:bg-red-100"
+                            className="ml-1 h-4 w-4 p-0 hover:bg-[#E4DCD0]"
                           >
-                            <X className="w-3 h-3 text-red-500" />
+                            <X className="w-3 h-3 text-[#8B745F]" />
                           </Button>
                         </Badge>
                       ))}

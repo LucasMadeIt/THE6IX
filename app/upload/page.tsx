@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
@@ -23,20 +23,18 @@ import {
   Zap,
   FileVideo,
   X,
-  ImageIcon,
 } from "lucide-react"
-import Link from "next/link"
 import React from "react"
 
 export default function UploadPage() {
   const [activeStep, setActiveStep] = useState(1)
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
+  const [videoThumbnail, setVideoThumbnail] = useState<string | null>(null)
   const [roomTitle, setRoomTitle] = useState("")
   const [roomDescription, setRoomDescription] = useState("")
-  const [thumbnail, setThumbnail] = useState<string | null>(null)
-  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
+  const videoRef = useRef<HTMLVideoElement>(null)
 
   const steps = [
     {
@@ -116,43 +114,53 @@ export default function UploadPage() {
     },
   ]
 
+  const generateVideoThumbnail = (file: File) => {
+    const video = document.createElement("video")
+    const canvas = document.createElement("canvas")
+    const ctx = canvas.getContext("2d")
+
+    video.addEventListener("loadedmetadata", () => {
+      canvas.width = video.videoWidth
+      canvas.height = video.videoHeight
+      video.currentTime = 1 // Get frame at 1 second
+    })
+
+    video.addEventListener("seeked", () => {
+      if (ctx) {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+        const thumbnailDataUrl = canvas.toDataURL("image/jpeg", 0.8)
+        setVideoThumbnail(thumbnailDataUrl)
+      }
+    })
+
+    video.src = URL.createObjectURL(file)
+  }
+
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
       setUploadedFile(file)
+      generateVideoThumbnail(file)
     }
   }
 
-  const handleThumbnailUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      setThumbnailFile(file)
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        setThumbnail(e.target?.result as string)
-      }
-      reader.readAsDataURL(file)
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    const file = event.dataTransfer.files?.[0]
+    if (file && file.type.startsWith("video/")) {
+      setUploadedFile(file)
+      generateVideoThumbnail(file)
     }
   }
 
-  const removeThumbnail = () => {
-    setThumbnailFile(null)
-    setThumbnail(null)
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault()
   }
 
   const handleSubmit = () => {
     if (uploadedFile && roomTitle) {
       setIsProcessing(true)
-      // Simulate upload progress
-      const interval = setInterval(() => {
-        setUploadProgress((prev) => {
-          if (prev >= 100) {
-            clearInterval(interval)
-            return 100
-          }
-          return prev + 10
-        })
-      }, 500)
+      setUploadProgress(1) // Stuck at 1%
     }
   }
 
@@ -164,7 +172,7 @@ export default function UploadPage() {
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12 sm:mb-16">
-            <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl font-normal text-[#43382F] mb-4 sm:mb-6 tracking-wide leading-tight">
+            <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl font-normal text-[#43382F] mb-4 sm:mb-6 tracking-wide leading-tight italic">
               Create Your
               <br />
               <span className="italic">Memory Room</span>
@@ -383,7 +391,11 @@ export default function UploadPage() {
                       <div>
                         <label className="block text-sm font-medium text-[#43382F] mb-3">Video File</label>
                         {!uploadedFile ? (
-                          <div className="border-2 border-dashed border-[#E4DCD0] rounded-xl p-8 text-center bg-[#F0EBE5]">
+                          <div
+                            className="border-2 border-dashed border-[#E4DCD0] rounded-xl p-8 text-center bg-[#F0EBE5] cursor-pointer hover:border-[#8B745F] transition-colors"
+                            onDrop={handleDrop}
+                            onDragOver={handleDragOver}
+                          >
                             <FileVideo className="w-12 h-12 text-[#8B745F] mx-auto mb-4" />
                             <p className="text-[#6B5B4F] mb-4">Drag and drop your video here, or click to browse</p>
                             <input
@@ -407,24 +419,48 @@ export default function UploadPage() {
                             </label>
                           </div>
                         ) : (
-                          <div className="bg-[#F0EBE5] rounded-xl p-4 flex items-center justify-between">
-                            <div className="flex items-center space-x-3">
-                              <FileVideo className="w-8 h-8 text-[#8B745F]" />
-                              <div>
-                                <p className="font-medium text-[#43382F]">{uploadedFile.name}</p>
-                                <p className="text-sm text-[#6B5B4F]">
-                                  {(uploadedFile.size / (1024 * 1024)).toFixed(2)} MB
-                                </p>
+                          <div className="space-y-4">
+                            <div className="bg-[#F0EBE5] rounded-xl p-4 flex items-center justify-between">
+                              <div className="flex items-center space-x-3">
+                                <FileVideo className="w-8 h-8 text-[#8B745F]" />
+                                <div>
+                                  <p className="font-medium text-[#43382F]">{uploadedFile.name}</p>
+                                  <p className="text-sm text-[#6B5B4F]">
+                                    {(uploadedFile.size / (1024 * 1024)).toFixed(2)} MB
+                                  </p>
+                                </div>
                               </div>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => {
+                                  setUploadedFile(null)
+                                  setVideoThumbnail(null)
+                                }}
+                                className="text-red-500 hover:bg-red-50"
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
                             </div>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => setUploadedFile(null)}
-                              className="text-red-500 hover:bg-red-50"
-                            >
-                              <X className="w-4 h-4" />
-                            </Button>
+
+                            {/* Video Thumbnail Preview */}
+                            {videoThumbnail && (
+                              <div>
+                                <label className="block text-sm font-medium text-[#43382F] mb-2">Video Preview</label>
+                                <div className="relative">
+                                  <img
+                                    src={videoThumbnail || "/placeholder.svg"}
+                                    alt="Video thumbnail"
+                                    className="w-full h-32 object-cover rounded-xl"
+                                  />
+                                  <div className="absolute inset-0 bg-black/20 rounded-xl flex items-center justify-center">
+                                    <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center">
+                                      <Video className="w-6 h-6 text-[#8B745F]" />
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
@@ -451,55 +487,6 @@ export default function UploadPage() {
                         />
                       </div>
 
-                      {/* Thumbnail Upload */}
-                      <div>
-                        <label className="block text-sm font-medium text-[#43382F] mb-2">
-                          Room Thumbnail (Optional)
-                        </label>
-                        {!thumbnail ? (
-                          <div className="border-2 border-dashed border-[#E4DCD0] rounded-xl p-6 text-center bg-[#F0EBE5]">
-                            <ImageIcon className="w-8 h-8 text-[#8B745F] mx-auto mb-3" />
-                            <p className="text-sm text-[#6B5B4F] mb-3">Upload a thumbnail image for your room</p>
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={handleThumbnailUpload}
-                              className="hidden"
-                              id="thumbnail-upload"
-                            />
-                            <label htmlFor="thumbnail-upload">
-                              <Button
-                                asChild
-                                variant="outline"
-                                size="sm"
-                                className="rounded-full bg-white border-[#8B745F] text-[#8B745F] hover:bg-[#F0EBE5]"
-                              >
-                                <span className="cursor-pointer">
-                                  <Upload className="w-4 h-4 mr-2" />
-                                  Choose Image
-                                </span>
-                              </Button>
-                            </label>
-                          </div>
-                        ) : (
-                          <div className="relative">
-                            <img
-                              src={thumbnail || "/placeholder.svg"}
-                              alt="Room thumbnail"
-                              className="w-full h-32 object-cover rounded-xl"
-                            />
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={removeThumbnail}
-                              className="absolute top-2 right-2 bg-white/90 hover:bg-white rounded-full w-8 h-8 p-0"
-                            >
-                              <X className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-
                       <Button
                         onClick={handleSubmit}
                         disabled={!uploadedFile || !roomTitle}
@@ -512,8 +499,12 @@ export default function UploadPage() {
                     </div>
                   ) : (
                     <div className="text-center py-8">
-                      <div className="w-16 h-16 bg-[#F0EBE5] rounded-full flex items-center justify-center mx-auto mb-6">
-                        <Zap className="w-8 h-8 text-[#8B745F] animate-pulse" />
+                      <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <img
+                          src="/funny-processing.gif"
+                          alt="Processing animation"
+                          className="w-full h-full object-contain rounded-full"
+                        />
                       </div>
                       <h3 className="font-serif text-xl font-semibold text-[#43382F] mb-4 tracking-wide">
                         Creating Your Memory Room
@@ -522,18 +513,10 @@ export default function UploadPage() {
                         We're processing your video and transforming it into a 3D memory gallery...
                       </p>
                       <Progress value={uploadProgress} className="w-full mb-4" />
-                      <p className="text-sm text-[#8B745F]">{uploadProgress}% complete</p>
-                      {uploadProgress === 100 && (
-                        <div className="mt-6">
-                          <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
-                          <p className="text-green-600 font-medium">Memory room created successfully!</p>
-                          <Link href="/my-memories">
-                            <Button className="mt-4 bg-[#8B745F] hover:bg-[#6B5B4F] text-white rounded-xl">
-                              View My Memories
-                            </Button>
-                          </Link>
-                        </div>
-                      )}
+                      <p className="text-sm text-[#8B745F]">{uploadProgress}% complete - This might take a while!</p>
+                      <p className="text-xs text-[#6B5B4F] mt-2">
+                        Our AI is working hard to reconstruct your space in 3D. Feel free to grab a coffee! ☕
+                      </p>
                     </div>
                   )}
                 </CardContent>
