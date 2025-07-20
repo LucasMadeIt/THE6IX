@@ -199,9 +199,7 @@ export default function UploadPage() {
             const depthGifUrl = URL.createObjectURL(depthGifBlob);
             console.log("Depth GIF URL:", depthGifUrl);
 
-            if (imgRef.current) {
-                imgRef.current.src = depthGifUrl;
-              }
+          
             // You can set this URL in state to show the GIF preview
 
             // Prepare video form data
@@ -224,6 +222,7 @@ export default function UploadPage() {
             const describeJson = await describeResponse.json();
             console.log("Description:", describeJson.answer);
 
+            
             // Do whatever you want with depthGifUrl and describeJson.answer here
         } catch (error) {
             console.error("Error during submission:", error);
