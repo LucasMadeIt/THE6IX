@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Navigation } from "@/components/navigation"
 import {
   Search,
@@ -27,9 +28,20 @@ import {
   Upload,
   X,
   ImageIcon,
+  MessageCircle,
+  Send,
+  Eye,
 } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import Link from "next/link"
+
+interface Comment {
+  id: string
+  author: string
+  avatar: string
+  content: string
+  timestamp: string
+}
 
 interface MemoryRoom {
   id: string
@@ -43,6 +55,8 @@ interface MemoryRoom {
   lastVisited: string
   tags: string[]
   processing?: boolean
+  isShared?: boolean
+  comments?: Comment[]
 }
 
 export default function MyMemoriesPage() {
@@ -50,38 +64,18 @@ export default function MyMemoriesPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [sortBy, setSortBy] = useState("recent")
   const [editingRoom, setEditingRoom] = useState<MemoryRoom | null>(null)
+  const [viewingRoom, setViewingRoom] = useState<MemoryRoom | null>(null)
   const [editTitle, setEditTitle] = useState("")
   const [editDescription, setEditDescription] = useState("")
+  const [editTags, setEditTags] = useState<string[]>([])
+  const [newTag, setNewTag] = useState("")
   const [editThumbnail, setEditThumbnail] = useState<string | null>(null)
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null)
+  const [newComment, setNewComment] = useState("")
 
   const [memoryRooms, setMemoryRooms] = useState<MemoryRoom[]>([
     {
       id: "1",
-      title: "Grandma's Kitchen",
-      description: "Sunday morning pancakes and warm conversations that filled our hearts",
-      thumbnail: "/placeholder.svg?height=280&width=400",
-      objectCount: 12,
-      memories: 8,
-      contributors: ["You", "Mom", "Sister"],
-      createdAt: "2024-01-15",
-      lastVisited: "2 hours ago",
-      tags: ["family", "cooking", "vintage", "warmth"],
-    },
-    {
-      id: "2",
-      title: "Childhood Bedroom",
-      description: "Where dreams began and bedtime stories came to life every night",
-      thumbnail: "/placeholder.svg?height=280&width=400",
-      objectCount: 15,
-      memories: 12,
-      contributors: ["You"],
-      createdAt: "2024-01-10",
-      lastVisited: "Yesterday",
-      tags: ["childhood", "dreams", "books", "toys"],
-    },
-    {
-      id: "3",
       title: "First Apartment Living Room",
       description: "Independence, movie nights, and the beginning of adulthood",
       thumbnail: "/placeholder.svg?height=280&width=400",
@@ -94,40 +88,111 @@ export default function MyMemoriesPage() {
       processing: true,
     },
     {
-      id: "4",
+      id: "2",
+      title: "Grandma's Kitchen",
+      description: "Sunday morning pancakes and warm conversations that filled our hearts",
+      thumbnail: "/images/grandmas-kitchen.jpg",
+      objectCount: 12,
+      memories: 8,
+      contributors: ["You", "Mom", "Sister"],
+      createdAt: "2024-01-15",
+      lastVisited: "2 hours ago",
+      tags: ["family", "cooking", "vintage", "warmth"],
+      isShared: true,
+      comments: [
+        {
+          id: "1",
+          author: "Mom",
+          avatar: "/placeholder-user.jpg",
+          content: "This brings back so many beautiful memories! I can almost smell the pancakes cooking.",
+          timestamp: "2 hours ago",
+        },
+        {
+          id: "2",
+          author: "Sister",
+          avatar: "/placeholder-user.jpg",
+          content: "Remember how Grandma would always have fresh flowers on the table? 💐",
+          timestamp: "1 hour ago",
+        },
+      ],
+    },
+    {
+      id: "3",
       title: "Mom's Garden Shed",
       description: "Where tools became treasures and every plant had a story",
-      thumbnail: "/placeholder.svg?height=280&width=400",
+      thumbnail: "/images/garden-shed.jpg",
       objectCount: 20,
       memories: 15,
       contributors: ["You", "Mom", "Dad"],
       createdAt: "2024-01-05",
       lastVisited: "1 week ago",
       tags: ["garden", "nature", "tools", "seasons"],
+      isShared: true,
+      comments: [
+        {
+          id: "1",
+          author: "Dad",
+          avatar: "/placeholder-user.jpg",
+          content: "Mom spent countless hours in here nurturing her plants. It was her sanctuary.",
+          timestamp: "3 days ago",
+        },
+      ],
     },
     {
-      id: "5",
+      id: "4",
       title: "College Dorm Room",
       description: "Late-night study sessions and lifelong friendships formed",
-      thumbnail: "/placeholder.svg?height=280&width=400",
+      thumbnail: "/images/college-dorm.jpg",
       objectCount: 10,
       memories: 9,
       contributors: ["You", "Roommate", "Friends"],
       createdAt: "2024-01-01",
       lastVisited: "2 weeks ago",
       tags: ["college", "studying", "friendship", "music"],
+      isShared: true,
+      comments: [
+        {
+          id: "1",
+          author: "College Roommate",
+          avatar: "/placeholder-user.jpg",
+          content: "Those were the best days! Remember our late-night pizza runs? 🍕",
+          timestamp: "1 week ago",
+        },
+      ],
+    },
+    {
+      id: "5",
+      title: "Movie Theatre",
+      description: "Where stories came alive and dreams were born on the silver screen",
+      thumbnail: "/images/movie-theatre.jpg",
+      objectCount: 15,
+      memories: 12,
+      contributors: ["You", "Friends"],
+      createdAt: "2023-12-20",
+      lastVisited: "3 weeks ago",
+      tags: ["movies", "entertainment", "friends", "memories"],
     },
     {
       id: "6",
-      title: "Grandpa's Workshop",
-      description: "Wood shavings and wisdom, where hands created magic",
-      thumbnail: "/placeholder.svg?height=280&width=400",
-      objectCount: 25,
-      memories: 18,
-      contributors: ["You", "Grandpa", "Dad"],
-      createdAt: "2023-12-28",
-      lastVisited: "3 weeks ago",
-      tags: ["woodworking", "crafts", "wisdom", "tools"],
+      title: "Bathroom",
+      description: "Friends helped me through my worst moments here, making me feel valued and supported",
+      thumbnail: "/images/bathroom.jpg",
+      objectCount: 8,
+      memories: 5,
+      contributors: ["You", "Best Friend"],
+      createdAt: "2023-12-15",
+      lastVisited: "1 month ago",
+      tags: ["support", "friendship", "healing", "care"],
+      isShared: true,
+      comments: [
+        {
+          id: "1",
+          author: "Best Friend",
+          avatar: "/placeholder-user.jpg",
+          content: "I'm so glad I could be there for you during those tough times. You're stronger than you know! 💪❤️",
+          timestamp: "2 weeks ago",
+        },
+      ],
     },
   ])
 
@@ -144,6 +209,13 @@ export default function MyMemoriesPage() {
     setEditDescription(room.description)
     setEditThumbnail(room.thumbnail)
     setThumbnailFile(null)
+  }
+
+  const handleViewRoom = (room: MemoryRoom) => {
+    setViewingRoom(room)
+    setEditTitle(room.title)
+    setEditDescription(room.description)
+    setEditTags([...room.tags])
   }
 
   const handleThumbnailUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -185,8 +257,65 @@ export default function MyMemoriesPage() {
     }
   }
 
+  const handleSaveView = () => {
+    if (viewingRoom) {
+      setMemoryRooms((rooms) =>
+        rooms.map((room) =>
+          room.id === viewingRoom.id
+            ? {
+                ...room,
+                title: editTitle,
+                description: editDescription,
+                tags: editTags,
+              }
+            : room,
+        ),
+      )
+      setViewingRoom(null)
+      setEditTitle("")
+      setEditDescription("")
+      setEditTags([])
+    }
+  }
+
   const handleDeleteRoom = (roomId: string) => {
     setMemoryRooms((rooms) => rooms.filter((room) => room.id !== roomId))
+  }
+
+  const handleAddTag = () => {
+    if (newTag.trim() && !editTags.includes(newTag.trim())) {
+      setEditTags([...editTags, newTag.trim()])
+      setNewTag("")
+    }
+  }
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    setEditTags(editTags.filter((tag) => tag !== tagToRemove))
+  }
+
+  const handleAddComment = () => {
+    if (newComment.trim() && viewingRoom) {
+      const comment: Comment = {
+        id: Date.now().toString(),
+        author: "You",
+        avatar: "/placeholder-user.jpg",
+        content: newComment,
+        timestamp: "Just now",
+      }
+
+      setMemoryRooms((rooms) =>
+        rooms.map((room) =>
+          room.id === viewingRoom.id
+            ? {
+                ...room,
+                comments: [...(room.comments || []), comment],
+              }
+            : room,
+        ),
+      )
+
+      setNewComment("")
+    }
   }
 
   return (
@@ -273,6 +402,7 @@ export default function MyMemoriesPage() {
                 <div className="relative">
                   <div
                     className={`${viewMode === "grid" ? "aspect-[4/3]" : "aspect-[16/9] sm:aspect-[4/3]"} overflow-hidden`}
+                    onClick={() => handleViewRoom(room)}
                   >
                     <img
                       src={room.thumbnail || "/placeholder.svg"}
@@ -406,6 +536,185 @@ export default function MyMemoriesPage() {
           )}
         </div>
       </div>
+
+      {/* View Room Dialog */}
+      <Dialog open={!!viewingRoom} onOpenChange={() => setViewingRoom(null)}>
+        <DialogContent className="bg-white border-[#E4DCD0] max-w-4xl mx-4 sm:mx-auto max-h-[90vh] overflow-y-auto">
+          {viewingRoom && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="font-serif text-2xl text-[#43382F] tracking-wide">
+                  Memory Room Details
+                </DialogTitle>
+              </DialogHeader>
+
+              <div className="space-y-6 pt-4">
+                {/* Thumbnail Image */}
+                <div className="w-full h-64 sm:h-80 overflow-hidden rounded-xl">
+                  <img
+                    src={viewingRoom.thumbnail || "/placeholder.svg"}
+                    alt={viewingRoom.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+
+                {/* Editable Title and Description */}
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-[#43382F] mb-2">Room Title</label>
+                    <Input
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      className="bg-[#F0EBE5] border-[#E4DCD0] rounded-xl text-[#43382F] text-lg font-semibold"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[#43382F] mb-2">Description</label>
+                    <Textarea
+                      value={editDescription}
+                      onChange={(e) => setEditDescription(e.target.value)}
+                      className="bg-[#F0EBE5] border-[#E4DCD0] rounded-xl text-[#43382F] resize-none"
+                      rows={3}
+                    />
+                  </div>
+
+                  {/* Tags Section */}
+                  <div>
+                    <label className="block text-sm font-medium text-[#43382F] mb-2">Tags</label>
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {editTags.map((tag) => (
+                        <Badge
+                          key={tag}
+                          variant="outline"
+                          className="text-xs border-amber-200 text-amber-700 bg-amber-50 pr-1"
+                        >
+                          <Tag className="w-3 h-3 mr-1" />
+                          {tag}
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleRemoveTag(tag)}
+                            className="ml-1 h-4 w-4 p-0 hover:bg-red-100"
+                          >
+                            <X className="w-3 h-3 text-red-500" />
+                          </Button>
+                        </Badge>
+                      ))}
+                    </div>
+                    <div className="flex gap-2">
+                      <Input
+                        value={newTag}
+                        onChange={(e) => setNewTag(e.target.value)}
+                        placeholder="Add new tag..."
+                        className="bg-[#F0EBE5] border-[#E4DCD0] rounded-xl text-[#43382F] text-sm"
+                        onKeyPress={(e) => e.key === "Enter" && handleAddTag()}
+                      />
+                      <Button
+                        onClick={handleAddTag}
+                        disabled={!newTag.trim()}
+                        size="sm"
+                        className="bg-[#8B745F] hover:bg-[#6B5B4F] text-white rounded-xl"
+                      >
+                        Add
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Date Section */}
+                  <div>
+                    <label className="block text-sm font-medium text-[#43382F] mb-2">Created Date</label>
+                    <div className="flex items-center space-x-2 text-[#6B5B4F]">
+                      <Calendar className="w-4 h-4" />
+                      <span>{new Date(viewingRoom.createdAt).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* View in 3D Button */}
+                <div className="border-t border-[#E4DCD0] pt-6">
+                  <Button
+                    size="lg"
+                    className="w-full bg-gradient-to-r from-[#8B745F] to-[#6B5B4F] hover:from-[#6B5B4F] hover:to-[#5A4A3F] text-white rounded-xl py-4 font-medium tracking-wide"
+                  >
+                    <Eye className="w-5 h-5 mr-2" />
+                    View in 3D & Explore
+                  </Button>
+                </div>
+
+                {/* Comments Section - Only if shared */}
+                {viewingRoom.isShared && (
+                  <div className="border-t border-[#E4DCD0] pt-6">
+                    <h3 className="font-serif text-lg font-semibold text-[#43382F] mb-4 flex items-center">
+                      <MessageCircle className="w-5 h-5 mr-2" />
+                      Comments from Family & Friends
+                    </h3>
+
+                    {/* Existing Comments */}
+                    <div className="space-y-4 mb-6">
+                      {viewingRoom.comments?.map((comment) => (
+                        <div key={comment.id} className="flex space-x-3">
+                          <Avatar className="w-8 h-8">
+                            <AvatarImage src={comment.avatar || "/placeholder.svg"} />
+                            <AvatarFallback>{comment.author[0]}</AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 bg-[#F0EBE5] rounded-lg p-3">
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="font-medium text-[#43382F] text-sm">{comment.author}</span>
+                              <span className="text-xs text-[#8B745F]">{comment.timestamp}</span>
+                            </div>
+                            <p className="text-[#6B5B4F] text-sm">{comment.content}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Add New Comment */}
+                    <div className="flex space-x-3">
+                      <Avatar className="w-8 h-8">
+                        <AvatarImage src="/placeholder-user.jpg" />
+                        <AvatarFallback>Y</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 flex space-x-2">
+                        <Input
+                          value={newComment}
+                          onChange={(e) => setNewComment(e.target.value)}
+                          placeholder="Add a comment..."
+                          className="bg-[#F0EBE5] border-[#E4DCD0] rounded-xl text-[#43382F]"
+                          onKeyPress={(e) => e.key === "Enter" && handleAddComment()}
+                        />
+                        <Button
+                          onClick={handleAddComment}
+                          disabled={!newComment.trim()}
+                          size="sm"
+                          className="bg-[#8B745F] hover:bg-[#6B5B4F] text-white rounded-xl"
+                        >
+                          <Send className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex gap-3 pt-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => setViewingRoom(null)}
+                    className="flex-1 bg-white border-[#E4DCD0] text-[#8B745F] hover:bg-[#F0EBE5] rounded-xl"
+                  >
+                    Close
+                  </Button>
+                  <Button
+                    onClick={handleSaveView}
+                    className="flex-1 bg-[#8B745F] hover:bg-[#6B5B4F] text-white rounded-xl"
+                  >
+                    Save Changes
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Edit Dialog */}
       <Dialog open={!!editingRoom} onOpenChange={() => setEditingRoom(null)}>

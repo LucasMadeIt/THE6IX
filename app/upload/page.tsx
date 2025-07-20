@@ -1,29 +1,125 @@
 "use client"
 
-import type React from "react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Textarea } from "@/components/ui/textarea"
+import { Progress } from "@/components/ui/progress"
 import { Navigation } from "@/components/navigation"
-import { Upload, Video, Clock, CheckCircle, ArrowRight, Camera, ImageIcon, X } from "lucide-react"
+import {
+  Upload,
+  Camera,
+  Clock,
+  Lightbulb,
+  CheckCircle,
+  ArrowRight,
+  Smartphone,
+  Video,
+  Settings,
+  Eye,
+  Move,
+  Zap,
+  FileVideo,
+  X,
+  ImageIcon,
+} from "lucide-react"
 import Link from "next/link"
+import React from "react"
 
 export default function UploadPage() {
-  const [uploadStep, setUploadStep] = useState(1)
+  const [activeStep, setActiveStep] = useState(1)
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null)
   const [roomTitle, setRoomTitle] = useState("")
   const [roomDescription, setRoomDescription] = useState("")
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null)
+  const [thumbnail, setThumbnail] = useState<string | null>(null)
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null)
-  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
+
+  const steps = [
+    {
+      id: 1,
+      title: "Prepare Your Space",
+      icon: Settings,
+      duration: "15 minutes",
+      description: "Clean and organize your room for the best 3D reconstruction",
+      tips: [
+        "Remove clutter and unnecessary items",
+        "Ensure good lighting throughout the room",
+        "Open curtains or blinds for natural light",
+        "Turn on all room lights for even illumination",
+      ],
+    },
+    {
+      id: 2,
+      title: "Camera Setup",
+      icon: Camera,
+      duration: "1 minute",
+      description: "Configure your device for optimal video quality",
+      tips: [
+        "Use landscape orientation (horizontal)",
+        "Set video quality to 1080p or higher",
+        "Enable image stabilization if available",
+        "Clean your camera lens for clarity",
+      ],
+    },
+    {
+      id: 3,
+      title: "Recording Technique",
+      icon: Video,
+      duration: "1-3 minutes",
+      description: "Follow the proper recording pattern for best results",
+      tips: [
+        "Start at the room entrance/doorway",
+        "Move slowly and steadily in a clockwise direction",
+        "Keep the camera at chest height (4-5 feet)",
+        "Overlap your shots by 30-50% for better stitching",
+      ],
+    },
+    {
+      id: 4,
+      title: "Capture Everything",
+      icon: Eye,
+      duration: "Throughout recording",
+      description: "Make sure to include all important details",
+      tips: [
+        "Film all four walls of the room",
+        "Include the ceiling and floor in your shots",
+        "Capture furniture and decorative items",
+        "Don't forget corners and hidden areas",
+      ],
+    },
+  ]
+
+  const commonMistakes = [
+    {
+      mistake: "Moving too quickly",
+      solution: "Take your time - slow, steady movements work best",
+      icon: Move,
+    },
+    {
+      mistake: "Poor lighting conditions",
+      solution: "Record during daytime with all lights on",
+      icon: Lightbulb,
+    },
+    {
+      mistake: "Shaky footage",
+      solution: "Use both hands and move smoothly",
+      icon: Smartphone,
+    },
+    {
+      mistake: "Missing areas",
+      solution: "Follow a systematic pattern around the room",
+      icon: Eye,
+    },
+  ]
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
       setUploadedFile(file)
-      setUploadStep(2)
     }
   }
 
@@ -33,7 +129,7 @@ export default function UploadPage() {
       setThumbnailFile(file)
       const reader = new FileReader()
       reader.onload = (e) => {
-        setThumbnailPreview(e.target?.result as string)
+        setThumbnail(e.target?.result as string)
       }
       reader.readAsDataURL(file)
     }
@@ -41,31 +137,31 @@ export default function UploadPage() {
 
   const removeThumbnail = () => {
     setThumbnailFile(null)
-    setThumbnailPreview(null)
+    setThumbnail(null)
   }
 
-  const handleCreateRoom = async () => {
-    setIsProcessing(true)
-    await new Promise((resolve) => setTimeout(resolve, 3000))
-    setUploadStep(3)
-    setIsProcessing(false)
-  }
-
-  const triggerFileUpload = () => {
-    document.getElementById("video-upload")?.click()
+  const handleSubmit = () => {
+    if (uploadedFile && roomTitle) {
+      setIsProcessing(true)
+      // Simulate upload progress
+      const interval = setInterval(() => {
+        setUploadProgress((prev) => {
+          if (prev >= 100) {
+            clearInterval(interval)
+            return 100
+          }
+          return prev + 10
+        })
+      }, 500)
+    }
   }
 
   return (
     <div className="min-h-screen bg-[#F5F1ED]">
       <Navigation />
 
-      {/* Decorative SVG Lines - Hidden on mobile */}
-      <svg className="decorative-line top-40 right-20 w-28 h-28 hidden lg:block" viewBox="0 0 100 100">
-        <path d="M10,30 Q50,10 90,30 Q70,70 30,90 Q10,50 10,30" />
-      </svg>
-
       <div className="pt-20 pb-20 px-4 sm:px-6">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12 sm:mb-16">
             <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl font-normal text-[#43382F] mb-4 sm:mb-6 tracking-wide leading-tight">
@@ -74,302 +170,376 @@ export default function UploadPage() {
               <span className="italic">Memory Room</span>
             </h1>
             <p className="text-base sm:text-lg text-[#6B5B4F] max-w-2xl mx-auto leading-relaxed font-light px-4">
-              Upload a 1-3 minute video of your special space and watch it transform into an immersive 3D gallery
+              Follow our guide to record the perfect video, then upload it to create your 3D memory gallery
             </p>
           </div>
 
-          {uploadStep === 1 && (
-            <div className="space-y-8 sm:space-y-12">
-              {/* Upload Zone */}
-              <Card className="bg-white border border-[#E4DCD0] rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg">
-                <CardContent className="p-8 sm:p-16">
-                  <div className="text-center">
-                    {/* Clickable Logo */}
-                    <div
-                      className="w-20 h-20 sm:w-24 sm:h-24 bg-[#F0EBE5] rounded-full flex items-center justify-center mx-auto mb-6 sm:mb-8 cursor-pointer hover:bg-[#E4DCD0] smooth-transition hover:scale-105"
-                      onClick={triggerFileUpload}
-                    >
-                      <img
-                        src="/xperi3d-logo.png"
-                        alt="XPERI3D Logo"
-                        className="w-12 h-12 sm:w-16 sm:h-16 object-contain"
-                      />
-                    </div>
-                    <h3 className="font-serif text-xl sm:text-2xl font-semibold text-[#43382F] mb-3 sm:mb-4 tracking-wide">
-                      Upload Your Video
-                    </h3>
-                    <p className="text-[#6B5B4F] mb-8 sm:mb-10 max-w-md mx-auto font-light leading-relaxed text-sm sm:text-base">
-                      Choose a video file of your room or special space. We'll handle the magic of turning it into 3D.
-                    </p>
+          {/* Quick Stats */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-12 sm:mb-16">
+            <Card className="bg-white border border-[#E4DCD0] rounded-xl sm:rounded-2xl shadow-sm">
+              <CardContent className="p-6 text-center">
+                <div className="w-12 h-12 bg-[#F0EBE5] rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Clock className="w-6 h-6 text-[#8B745F]" />
+                </div>
+                <h3 className="font-serif text-lg font-semibold text-[#43382F] mb-2">1-3 Minutes</h3>
+                <p className="text-sm text-[#6B5B4F] font-light">Recording Duration</p>
+              </CardContent>
+            </Card>
 
-                    <input
-                      type="file"
-                      accept="video/*"
-                      onChange={handleFileUpload}
-                      className="hidden"
-                      id="video-upload"
-                    />
-                    <label htmlFor="video-upload">
-                      <Button
-                        asChild
-                        size="lg"
-                        className="bg-[#8B745F] hover:bg-[#6B5B4F] text-white rounded-full px-8 sm:px-10 py-3 sm:py-4 shadow-lg hover:shadow-xl smooth-transition font-medium tracking-wide w-full sm:w-auto"
-                      >
-                        <span className="cursor-pointer">
-                          <Video className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                          Choose Video File
-                        </span>
-                      </Button>
-                    </label>
+            <Card className="bg-white border border-[#E4DCD0] rounded-xl sm:rounded-2xl shadow-sm">
+              <CardContent className="p-6 text-center">
+                <div className="w-12 h-12 bg-[#F0EBE5] rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Video className="w-6 h-6 text-[#8B745F]" />
+                </div>
+                <h3 className="font-serif text-lg font-semibold text-[#43382F] mb-2">1080p+</h3>
+                <p className="text-sm text-[#6B5B4F] font-light">Minimum Quality</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white border border-[#E4DCD0] rounded-xl sm:rounded-2xl shadow-sm">
+              <CardContent className="p-6 text-center">
+                <div className="w-12 h-12 bg-[#F0EBE5] rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Zap className="w-6 h-6 text-[#8B745F]" />
+                </div>
+                <h3 className="font-serif text-lg font-semibold text-[#43382F] mb-2">30 Min</h3>
+                <p className="text-sm text-[#6B5B4F] font-light">Processing Time</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Two Column Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            {/* Left Column - Recording Guide */}
+            <div>
+              <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-[#43382F] mb-8 tracking-wide">
+                Recording Guide
+              </h2>
+
+              {/* Steps Navigation */}
+              <div className="space-y-4 mb-8">
+                {steps.map((step) => (
+                  <Card
+                    key={step.id}
+                    className={`cursor-pointer transition-all duration-300 border ${
+                      activeStep === step.id
+                        ? "bg-[#F0EBE5] border-[#8B745F] shadow-md"
+                        : "bg-white border-[#E4DCD0] hover:border-[#D4C4B0]"
+                    } rounded-xl`}
+                    onClick={() => setActiveStep(step.id)}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-start space-x-3">
+                        <div
+                          className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                            activeStep === step.id ? "bg-[#8B745F]" : "bg-[#F0EBE5]"
+                          }`}
+                        >
+                          <step.icon
+                            className={`w-5 h-5 ${activeStep === step.id ? "text-white" : "text-[#8B745F]"}`}
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-1">
+                            <h3
+                              className={`font-serif text-base font-semibold tracking-wide ${
+                                activeStep === step.id ? "text-[#43382F]" : "text-[#6B5B4F]"
+                              }`}
+                            >
+                              {step.title}
+                            </h3>
+                            <Badge
+                              variant="outline"
+                              className={`text-xs ${
+                                activeStep === step.id
+                                  ? "border-[#8B745F] text-[#8B745F] bg-white"
+                                  : "border-[#D4C4B0] text-[#8B745F] bg-[#F0EBE5]"
+                              }`}
+                            >
+                              {step.duration}
+                            </Badge>
+                          </div>
+                          <p
+                            className={`text-sm font-light leading-relaxed ${
+                              activeStep === step.id ? "text-[#43382F]" : "text-[#8B745F]"
+                            }`}
+                          >
+                            {step.description}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              {/* Step Details */}
+              <Card className="bg-white border border-[#E4DCD0] rounded-xl shadow-lg mb-8">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="w-12 h-12 bg-[#8B745F] rounded-full flex items-center justify-center">
+                      {React.createElement(steps[activeStep - 1].icon, {
+                        className: "w-6 h-6 text-white",
+                      })}
+                    </div>
+                    <div>
+                      <h3 className="font-serif text-lg font-semibold text-[#43382F] tracking-wide">
+                        {steps[activeStep - 1].title}
+                      </h3>
+                      <p className="text-[#6B5B4F] font-light text-sm">{steps[activeStep - 1].description}</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <h4 className="font-medium text-[#43382F] mb-3">Key Tips:</h4>
+                    {steps[activeStep - 1].tips.map((tip, index) => (
+                      <div key={index} className="flex items-start space-x-2">
+                        <CheckCircle className="w-4 h-4 text-[#8B745F] mt-0.5 flex-shrink-0" />
+                        <p className="text-sm text-[#6B5B4F] font-light leading-relaxed">{tip}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex gap-2 mt-6">
+                    <Button
+                      variant="outline"
+                      onClick={() => setActiveStep(Math.max(1, activeStep - 1))}
+                      disabled={activeStep === 1}
+                      size="sm"
+                      className="flex-1 bg-white border-[#E4DCD0] text-[#8B745F] hover:bg-[#F0EBE5] rounded-xl"
+                    >
+                      Previous
+                    </Button>
+                    <Button
+                      onClick={() => setActiveStep(Math.min(4, activeStep + 1))}
+                      disabled={activeStep === 4}
+                      size="sm"
+                      className="flex-1 bg-[#8B745F] hover:bg-[#6B5B4F] text-white rounded-xl"
+                    >
+                      Next Step
+                      <ArrowRight className="w-4 h-4 ml-1" />
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Requirements - Mobile Optimized */}
-              <div className="grid grid-cols-1 gap-6 sm:gap-8">
-                <Card className="bg-white border border-[#E4DCD0] rounded-xl sm:rounded-2xl shadow-sm">
-                  <CardContent className="p-6 sm:p-8">
-                    <h4 className="font-serif text-lg font-semibold text-[#43382F] mb-4 sm:mb-6 flex items-center tracking-wide">
-                      <Clock className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 text-[#8B745F]" />
-                      Video Requirements
-                    </h4>
-                    <ul className="space-y-2 sm:space-y-3 text-sm text-[#6B5B4F] font-light">
-                      <li className="flex items-center">
-                        <div className="w-1.5 h-1.5 bg-[#8B745F] rounded-full mr-3 sm:mr-4"></div>
-                        1-3 minutes duration
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-1.5 h-1.5 bg-[#8B745F] rounded-full mr-3 sm:mr-4"></div>
-                        30fps frame rate
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-1.5 h-1.5 bg-[#8B745F] rounded-full mr-3 sm:mr-4"></div>
-                        1080p resolution or higher
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-1.5 h-1.5 bg-[#8B745F] rounded-full mr-3 sm:mr-4"></div>
-                        Max 500MB file size
-                      </li>
-                    </ul>
-                  </CardContent>
-                </Card>
+              {/* Example Video */}
+              <Card className="bg-white border border-[#E4DCD0] rounded-xl shadow-lg mb-8">
+                <CardContent className="p-0">
+                  <div className="aspect-video bg-gradient-to-br from-[#F0EBE5] to-[#E4DCD0] flex items-center justify-center rounded-xl overflow-hidden">
+                    <iframe
+                      width="100%"
+                      height="100%"
+                      src="https://www.youtube.com/embed/jmdTfm3WX68"
+                      title="How to Record Perfect Videos"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      className="rounded-xl"
+                    ></iframe>
+                  </div>
+                </CardContent>
+              </Card>
 
-                <Card className="bg-white border border-[#E4DCD0] rounded-xl sm:rounded-2xl shadow-sm">
-                  <CardContent className="p-6 sm:p-8">
-                    <h4 className="font-serif text-lg font-semibold text-[#43382F] mb-4 sm:mb-6 flex items-center tracking-wide">
-                      <Camera className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 text-[#8B745F]" />
-                      Quick Tips
-                    </h4>
-                    <ul className="space-y-2 sm:space-y-3 text-sm text-[#6B5B4F] font-light">
-                      <li className="flex items-center">
-                        <div className="w-1.5 h-1.5 bg-[#8B745F] rounded-full mr-3 sm:mr-4"></div>
-                        Move slowly and steadily
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-1.5 h-1.5 bg-[#8B745F] rounded-full mr-3 sm:mr-4"></div>
-                        Capture all four walls
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-1.5 h-1.5 bg-[#8B745F] rounded-full mr-3 sm:mr-4"></div>
-                        Good lighting is essential
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-1.5 h-1.5 bg-[#8B745F] rounded-full mr-3 sm:mr-4"></div>
-                        Start at the doorway
-                      </li>
-                    </ul>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Guide Link */}
-              <div className="text-center">
-                <p className="text-[#6B5B4F] mb-4 sm:mb-6 font-light text-sm sm:text-base">
-                  Need help recording the perfect video?
-                </p>
-                <Link href="/how-to-record">
-                  <Button
-                    variant="outline"
-                    className="rounded-full bg-white border-[#8B745F] text-[#8B745F] hover:bg-[#F0EBE5] px-6 sm:px-8 py-2 sm:py-3 smooth-transition font-medium tracking-wide w-full sm:w-auto"
-                  >
-                    <Camera className="w-4 h-4 mr-2" />
-                    View Complete Recording Guide
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </Link>
+              {/* Common Mistakes */}
+              <div className="mb-8">
+                <h3 className="font-serif text-xl font-semibold text-[#43382F] mb-6 tracking-wide">
+                  Common Mistakes to Avoid
+                </h3>
+                <div className="grid grid-cols-1 gap-4">
+                  {commonMistakes.map((item, index) => (
+                    <Card key={index} className="bg-white border border-[#E4DCD0] rounded-xl shadow-sm">
+                      <CardContent className="p-4">
+                        <div className="flex items-start space-x-3">
+                          <div className="w-10 h-10 bg-red-50 rounded-full flex items-center justify-center">
+                            <item.icon className="w-5 h-5 text-red-500" />
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-serif text-base font-semibold text-[#43382F] mb-1 tracking-wide">
+                              {item.mistake}
+                            </h4>
+                            <p className="text-sm text-[#6B5B4F] font-light leading-relaxed">
+                              <span className="font-medium text-[#8B745F]">Solution:</span> {item.solution}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
               </div>
             </div>
-          )}
 
-          {uploadStep === 2 && !isProcessing && (
-            <Card className="bg-white border border-[#E4DCD0] rounded-2xl sm:rounded-3xl shadow-lg">
-              <CardContent className="p-8 sm:p-12">
-                <div className="text-center mb-8 sm:mb-10">
-                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-[#F0EBE5] rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
-                    <CheckCircle className="w-6 h-6 sm:w-8 sm:h-8 text-[#8B745F]" />
-                  </div>
-                  <h3 className="font-serif text-xl sm:text-2xl font-semibold text-[#43382F] mb-2 sm:mb-3 tracking-wide">
-                    Video Uploaded Successfully
-                  </h3>
-                  <p className="text-[#6B5B4F] font-light text-sm sm:text-base">
-                    Now let's add some details to make your memory room special
-                  </p>
-                </div>
+            {/* Right Column - Upload Form */}
+            <div className="lg:sticky lg:top-24 lg:h-fit">
+              <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-[#43382F] mb-8 tracking-wide">
+                Upload Your Video
+              </h2>
 
-                <div className="max-w-2xl mx-auto space-y-6 sm:space-y-8">
-                  <div>
-                    <label className="block text-sm font-medium text-[#43382F] mb-3 tracking-wide">Room Title</label>
-                    <Input
-                      value={roomTitle}
-                      onChange={(e) => setRoomTitle(e.target.value)}
-                      placeholder="e.g., Grandma's Kitchen, First Apartment..."
-                      className="bg-[#F0EBE5] border-[#E4DCD0] rounded-xl py-3 sm:py-4 text-[#43382F] placeholder:text-[#8B745F]"
-                    />
-                  </div>
+              <Card className="bg-white border border-[#E4DCD0] rounded-xl shadow-lg">
+                <CardContent className="p-8">
+                  {!isProcessing ? (
+                    <div className="space-y-6">
+                      {/* Video Upload */}
+                      <div>
+                        <label className="block text-sm font-medium text-[#43382F] mb-3">Video File</label>
+                        {!uploadedFile ? (
+                          <div className="border-2 border-dashed border-[#E4DCD0] rounded-xl p-8 text-center bg-[#F0EBE5]">
+                            <FileVideo className="w-12 h-12 text-[#8B745F] mx-auto mb-4" />
+                            <p className="text-[#6B5B4F] mb-4">Drag and drop your video here, or click to browse</p>
+                            <input
+                              type="file"
+                              accept="video/*"
+                              onChange={handleFileUpload}
+                              className="hidden"
+                              id="video-upload"
+                            />
+                            <label htmlFor="video-upload">
+                              <Button
+                                asChild
+                                variant="outline"
+                                className="rounded-full bg-white border-[#8B745F] text-[#8B745F] hover:bg-[#F0EBE5]"
+                              >
+                                <span className="cursor-pointer">
+                                  <Upload className="w-4 h-4 mr-2" />
+                                  Choose Video File
+                                </span>
+                              </Button>
+                            </label>
+                          </div>
+                        ) : (
+                          <div className="bg-[#F0EBE5] rounded-xl p-4 flex items-center justify-between">
+                            <div className="flex items-center space-x-3">
+                              <FileVideo className="w-8 h-8 text-[#8B745F]" />
+                              <div>
+                                <p className="font-medium text-[#43382F]">{uploadedFile.name}</p>
+                                <p className="text-sm text-[#6B5B4F]">
+                                  {(uploadedFile.size / (1024 * 1024)).toFixed(2)} MB
+                                </p>
+                              </div>
+                            </div>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => setUploadedFile(null)}
+                              className="text-red-500 hover:bg-red-50"
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        )}
+                      </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-[#43382F] mb-3 tracking-wide">
-                      Description (Optional)
-                    </label>
-                    <Textarea
-                      value={roomDescription}
-                      onChange={(e) => setRoomDescription(e.target.value)}
-                      placeholder="Share what makes this space special to you..."
-                      className="bg-[#F0EBE5] border-[#E4DCD0] rounded-xl resize-none py-3 sm:py-4 text-[#43382F] placeholder:text-[#8B745F]"
-                      rows={4}
-                    />
-                  </div>
-
-                  {/* Thumbnail Upload Section */}
-                  <div>
-                    <label className="block text-sm font-medium text-[#43382F] mb-3 tracking-wide">
-                      Room Thumbnail (Optional)
-                    </label>
-                    {!thumbnailPreview ? (
-                      <div className="border-2 border-dashed border-[#E4DCD0] rounded-xl p-6 text-center bg-[#F0EBE5]">
-                        <ImageIcon className="w-8 h-8 text-[#8B745F] mx-auto mb-3" />
-                        <p className="text-sm text-[#6B5B4F] mb-3">Upload a thumbnail image for your room</p>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleThumbnailUpload}
-                          className="hidden"
-                          id="thumbnail-upload"
+                      {/* Room Details */}
+                      <div>
+                        <label className="block text-sm font-medium text-[#43382F] mb-2">Room Title</label>
+                        <Input
+                          value={roomTitle}
+                          onChange={(e) => setRoomTitle(e.target.value)}
+                          placeholder="e.g., Grandma's Kitchen"
+                          className="bg-[#F0EBE5] border-[#E4DCD0] rounded-xl text-[#43382F]"
                         />
-                        <label htmlFor="thumbnail-upload">
-                          <Button
-                            asChild
-                            variant="outline"
-                            size="sm"
-                            className="rounded-full bg-white border-[#8B745F] text-[#8B745F] hover:bg-[#F0EBE5]"
-                          >
-                            <span className="cursor-pointer">
-                              <Upload className="w-4 h-4 mr-2" />
-                              Choose Image
-                            </span>
-                          </Button>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-[#43382F] mb-2">Description</label>
+                        <Textarea
+                          value={roomDescription}
+                          onChange={(e) => setRoomDescription(e.target.value)}
+                          placeholder="Describe the memories and stories this room holds..."
+                          className="bg-[#F0EBE5] border-[#E4DCD0] rounded-xl text-[#43382F] resize-none"
+                          rows={3}
+                        />
+                      </div>
+
+                      {/* Thumbnail Upload */}
+                      <div>
+                        <label className="block text-sm font-medium text-[#43382F] mb-2">
+                          Room Thumbnail (Optional)
                         </label>
+                        {!thumbnail ? (
+                          <div className="border-2 border-dashed border-[#E4DCD0] rounded-xl p-6 text-center bg-[#F0EBE5]">
+                            <ImageIcon className="w-8 h-8 text-[#8B745F] mx-auto mb-3" />
+                            <p className="text-sm text-[#6B5B4F] mb-3">Upload a thumbnail image for your room</p>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleThumbnailUpload}
+                              className="hidden"
+                              id="thumbnail-upload"
+                            />
+                            <label htmlFor="thumbnail-upload">
+                              <Button
+                                asChild
+                                variant="outline"
+                                size="sm"
+                                className="rounded-full bg-white border-[#8B745F] text-[#8B745F] hover:bg-[#F0EBE5]"
+                              >
+                                <span className="cursor-pointer">
+                                  <Upload className="w-4 h-4 mr-2" />
+                                  Choose Image
+                                </span>
+                              </Button>
+                            </label>
+                          </div>
+                        ) : (
+                          <div className="relative">
+                            <img
+                              src={thumbnail || "/placeholder.svg"}
+                              alt="Room thumbnail"
+                              className="w-full h-32 object-cover rounded-xl"
+                            />
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={removeThumbnail}
+                              className="absolute top-2 right-2 bg-white/90 hover:bg-white rounded-full w-8 h-8 p-0"
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        )}
                       </div>
-                    ) : (
-                      <div className="relative">
-                        <img
-                          src={thumbnailPreview || "/placeholder.svg"}
-                          alt="Room thumbnail"
-                          className="w-full h-32 sm:h-40 object-cover rounded-xl"
-                        />
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={removeThumbnail}
-                          className="absolute top-2 right-2 bg-white/90 hover:bg-white rounded-full w-8 h-8 p-0"
-                        >
-                          <X className="w-4 h-4" />
-                        </Button>
+
+                      <Button
+                        onClick={handleSubmit}
+                        disabled={!uploadedFile || !roomTitle}
+                        className="w-full bg-[#8B745F] hover:bg-[#6B5B4F] text-white rounded-xl py-4 font-medium tracking-wide"
+                        size="lg"
+                      >
+                        Create Memory Room
+                        <ArrowRight className="w-5 h-5 ml-2" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <div className="w-16 h-16 bg-[#F0EBE5] rounded-full flex items-center justify-center mx-auto mb-6">
+                        <Zap className="w-8 h-8 text-[#8B745F] animate-pulse" />
                       </div>
-                    )}
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4 sm:pt-6">
-                    <Button
-                      variant="outline"
-                      onClick={() => setUploadStep(1)}
-                      className="flex-1 rounded-xl bg-white border-[#8B745F] text-[#8B745F] hover:bg-[#F0EBE5] py-3 sm:py-4 smooth-transition font-medium tracking-wide"
-                    >
-                      Back
-                    </Button>
-                    <Button
-                      onClick={handleCreateRoom}
-                      disabled={!roomTitle.trim()}
-                      className="flex-1 bg-[#8B745F] hover:bg-[#6B5B4F] text-white rounded-xl py-3 sm:py-4 smooth-transition font-medium tracking-wide"
-                    >
-                      Create Memory Room
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {isProcessing && (
-            <Card className="bg-white border border-[#E4DCD0] rounded-2xl sm:rounded-3xl shadow-lg">
-              <CardContent className="p-12 sm:p-16 text-center">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 bg-[#F0EBE5] rounded-full flex items-center justify-center mx-auto mb-6 sm:mb-8 animate-pulse">
-                  <img
-                    src="/xperi3d-logo.png"
-                    alt="XPERI3D Logo"
-                    className="w-12 h-12 sm:w-16 sm:h-16 object-contain animate-spin"
-                  />
-                </div>
-                <h3 className="font-serif text-xl sm:text-2xl font-semibold text-[#43382F] mb-4 sm:mb-6 tracking-wide">
-                  Creating Your 3D Memory Room
-                </h3>
-                <p className="text-[#6B5B4F] mb-8 sm:mb-10 max-w-md mx-auto font-light leading-relaxed text-sm sm:text-base">
-                  Our AI is analyzing your video and reconstructing it into a beautiful, navigable 3D space...
-                </p>
-                <div className="w-64 sm:w-80 h-1 bg-[#E4DCD0] rounded-full mx-auto">
-                  <div
-                    className="h-1 bg-[#8B745F] rounded-full animate-pulse smooth-transition"
-                    style={{ width: "75%" }}
-                  ></div>
-                </div>
-                <p className="text-xs sm:text-sm text-[#8B745F] mt-4 sm:mt-6 font-light">
-                  This usually takes 2-3 minutes
-                </p>
-              </CardContent>
-            </Card>
-          )}
-
-          {uploadStep === 3 && (
-            <Card className="bg-white border border-[#E4DCD0] rounded-2xl sm:rounded-3xl shadow-lg">
-              <CardContent className="p-12 sm:p-16 text-center">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 bg-[#F0EBE5] rounded-full flex items-center justify-center mx-auto mb-6 sm:mb-8">
-                  <CheckCircle className="w-10 h-10 sm:w-12 sm:h-12 text-[#8B745F]" />
-                </div>
-                <h3 className="font-serif text-2xl sm:text-3xl font-semibold text-[#43382F] mb-4 sm:mb-6 tracking-wide">
-                  Your Memory Room is Ready!
-                </h3>
-                <p className="text-[#6B5B4F] mb-8 sm:mb-10 max-w-md mx-auto font-light leading-relaxed text-sm sm:text-base">
-                  {roomTitle} has been transformed into a beautiful 3D space. Ready to add your memories?
-                </p>
-                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-                  <Link href="/my-memories">
-                    <Button className="bg-[#8B745F] hover:bg-[#6B5B4F] text-white rounded-full px-6 sm:px-8 py-3 sm:py-4 smooth-transition font-medium tracking-wide w-full sm:w-auto">
-                      View My Memories
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </Button>
-                  </Link>
-                  <Link href="/">
-                    <Button
-                      variant="outline"
-                      className="rounded-full bg-white border-[#8B745F] text-[#8B745F] hover:bg-[#F0EBE5] px-6 sm:px-8 py-3 sm:py-4 smooth-transition font-medium tracking-wide w-full sm:w-auto"
-                    >
-                      Back to Home
-                    </Button>
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                      <h3 className="font-serif text-xl font-semibold text-[#43382F] mb-4 tracking-wide">
+                        Creating Your Memory Room
+                      </h3>
+                      <p className="text-[#6B5B4F] mb-6 font-light">
+                        We're processing your video and transforming it into a 3D memory gallery...
+                      </p>
+                      <Progress value={uploadProgress} className="w-full mb-4" />
+                      <p className="text-sm text-[#8B745F]">{uploadProgress}% complete</p>
+                      {uploadProgress === 100 && (
+                        <div className="mt-6">
+                          <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
+                          <p className="text-green-600 font-medium">Memory room created successfully!</p>
+                          <Link href="/my-memories">
+                            <Button className="mt-4 bg-[#8B745F] hover:bg-[#6B5B4F] text-white rounded-xl">
+                              View My Memories
+                            </Button>
+                          </Link>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </div>
       </div>
     </div>

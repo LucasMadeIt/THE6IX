@@ -1,96 +1,79 @@
 "use client"
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { Menu, X } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
 import { useState } from "react"
-
-const navItems = [
-  { label: "Home", href: "/" },
-  { label: "My Memories", href: "/my-memories" },
-  { label: "Upload", href: "/upload" },
-  { label: "How to Record", href: "/how-to-record" },
-]
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Menu, Home, FolderOpen, Upload } from "lucide-react"
 
 export function Navigation() {
-  const pathname = usePathname()
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
+
+  const navItems = [
+    { href: "/", label: "Home", icon: Home },
+    { href: "/my-memories", label: "My Memories", icon: FolderOpen },
+    { href: "/upload", label: "Upload", icon: Upload },
+  ]
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 bg-white/90 backdrop-blur-sm border-b border-[#E4DCD0]">
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 py-4 sm:py-5">
-        {/* Logo */}
-        <Link href="/" className="flex items-center space-x-2 sm:space-x-3">
-          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#F0EBE5] rounded-xl flex items-center justify-center shadow-sm">
-            <img src="/xperi3d-logo.png" alt="XPERI3D" className="w-6 h-6 sm:w-8 sm:h-8 object-contain" />
-          </div>
-          <span className="font-serif text-xl sm:text-2xl font-semibold text-[#43382F] tracking-wide">Roomember
-</span>
-        </Link>
-
-        {/* Desktop Nav Links */}
-        <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "relative text-[#8B745F] hover:text-[#43382F] smooth-transition font-medium tracking-wide text-sm lg:text-base",
-                pathname === item.href && "text-[#43382F]",
-              )}
-            >
-              {item.label}
-              {pathname === item.href && (
-                <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-[#8B745F] rounded-full" />
-              )}
-            </Link>
-          ))}
-        </nav>
-
-        {/* Desktop CTA Button */}
-        <div className="hidden md:block">
-          <Link href="/upload">
-            <Button className="bg-[#8B745F] hover:bg-[#6B5B4F] text-white rounded-full px-4 lg:px-6 py-2 smooth-transition font-medium tracking-wide text-sm lg:text-base">
-              Upload
-            </Button>
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-[#E4DCD0]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="flex items-center justify-between h-16 sm:h-20">
+          {/* Logo */}
+          <Link href="/" className="flex items-center space-x-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#8B745F] rounded-full flex items-center justify-center">
+              <span className="text-white font-bold text-sm sm:text-base">ML</span>
+            </div>
+            <span className="font-serif text-xl sm:text-2xl font-semibold text-[#43382F] tracking-wide">
+              Memory Lane
+            </span>
           </Link>
-        </div>
 
-        {/* Mobile Menu Button */}
-        <div className="md:hidden flex items-center space-x-2">
-          <Link href="/upload">
-            <Button className="bg-[#8B745F] hover:bg-[#6B5B4F] text-white rounded-full px-3 py-2 smooth-transition text-sm">
-              Upload
-            </Button>
-          </Link>
-          <Button variant="ghost" size="sm" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2">
-            {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </Button>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden bg-white border-t border-[#E4DCD0] shadow-lg">
-          <nav className="px-4 py-4 space-y-3">
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-8">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className={cn(
-                  "block px-4 py-3 rounded-xl text-[#8B745F] hover:text-[#43382F] hover:bg-[#F0EBE5] smooth-transition font-medium tracking-wide",
-                  pathname === item.href && "text-[#43382F] bg-[#F0EBE5]",
-                )}
+                className="flex items-center space-x-2 text-[#6B5B4F] hover:text-[#8B745F] transition-colors duration-200 font-medium"
               >
-                {item.label}
+                <item.icon className="w-4 h-4" />
+                <span>{item.label}</span>
               </Link>
             ))}
-          </nav>
+          </div>
+
+          {/* Mobile Navigation */}
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="sm" className="md:hidden p-2">
+                <Menu className="w-5 h-5 text-[#8B745F]" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="bg-white border-[#E4DCD0] w-64">
+              <div className="flex flex-col space-y-6 mt-8">
+                <div className="flex items-center space-x-3 pb-6 border-b border-[#E4DCD0]">
+                  <div className="w-10 h-10 bg-[#8B745F] rounded-full flex items-center justify-center">
+                    <span className="text-white font-bold">ML</span>
+                  </div>
+                  <span className="font-serif text-xl font-semibold text-[#43382F] tracking-wide">Memory Lane</span>
+                </div>
+                {navItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center space-x-3 text-[#6B5B4F] hover:text-[#8B745F] transition-colors duration-200 font-medium py-2"
+                  >
+                    <item.icon className="w-5 h-5" />
+                    <span>{item.label}</span>
+                  </Link>
+                ))}
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
-      )}
-    </header>
+      </div>
+    </nav>
   )
 }
