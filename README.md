@@ -14,6 +14,7 @@ Memory Lane is a web app that helps people preserve, relive, and share their mos
 * V0.dev for front-end development
 * Selenium automation to wrap Vid2Scene (no public API)
 * Twelve Labs for video understanding (experimental)
+* WebXR
 
 ## Challenges
 * Local rendering was too slow (30+ hours per scene)
