@@ -1,30 +1,30 @@
-# Xperi3d web app
+# Memory Lane
+Memory Lane is a web app that helps people preserve, relive, and share their most important memories as walkable 3D spaces.
 
-*Automatically synced with your [v0.dev](https://v0.dev) deployments*
+## What It Does
+* Users upload a video of a meaningful room
+* The app generates a 3D walkable version using Gsplat
+* Users can narrate or write stories linked to the space
+* AI remembers details and answers natural language questions
+* Family and friends can contribute their own memories
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/koobistyt-2136s-projects/v0-xperi3d-web-app)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/fZ12bw5pnMP)
+## How We Built It
+* Gsplat for 3D scene rendering
+* Google Gemini for memory narration and recall
+* V0.dev for front-end development
+* Selenium automation to wrap Vid2Scene (no public API)
+* Twelve Labs for video understanding (experimental)
 
-## Overview
+## Challenges
+* Local rendering was too slow (30+ hours per scene)
+* Built a custom wrapper to automate Vid2Scene via browser automation
+* Learned and integrated unfamiliar tools under time pressure
 
-This repository will stay in sync with your deployed chats on [v0.dev](https://v0.dev).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.dev](https://v0.dev).
+## What's Next
+* Add VR support
+* Make objects in the scene clickable with voice or story links
+* Create a simplified, narrated mode for elderly users
+* Transition to Luma AI or similar for higher-quality rendering
 
-## Deployment
-
-Your project is live at:
-
-**[https://vercel.com/koobistyt-2136s-projects/v0-xperi3d-web-app](https://vercel.com/koobistyt-2136s-projects/v0-xperi3d-web-app)**
-
-## Build your app
-
-Continue building your app on:
-
-**[https://v0.dev/chat/projects/fZ12bw5pnMP](https://v0.dev/chat/projects/fZ12bw5pnMP)**
-
-## How It Works
-
-1. Create and modify your project using [v0.dev](https://v0.dev)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+## Team
+Built at Hack the 6ix 2025.
